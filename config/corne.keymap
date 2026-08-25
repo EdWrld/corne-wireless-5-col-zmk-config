@@ -28,47 +28,51 @@
         compatible = "zmk,keymap";
 
         default_layer {
+            // 5-column US QWERTY: the 10 columns under Q-P, including ; , . /
             // -----------------------------------------------------------------------------------------
-            // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U   |  I   |  O   | P |
-            // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J   |  K   |  L   | ' |
-            // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M   | CTRL | META | . |
-            //             | GUI | LWR | SPC |     | ENT | RSE  | BSPC |
+            // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  |  O  |  P  |
+            // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  |  ;  |
+            // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  |  ,  |  .  |  /  |
+            //             | GUI | NAV | SPC |     | ENT | NUM | BSPC |
             display-name = "Base";
             bindings = <
-                &as LS(Q) Q  &as LS(W) W  &as LS(E) E  &as LS(R) R  &as LS(T) T      &as LS(Y) Y  &as LS(U) U  &as LS(I) I     &as LS(O) O     &as LS(P) P
-                &as LS(A) A  &as LS(S) S  &as LS(D) D  &as LS(F) F  &as LS(G) G      &as LS(H) H  &as LS(J) J  &as LS(K) K     &as LS(L) L     &as LS(SQT) SQT
-                &as LS(Z) Z  &as LS(X) X  &as LS(C) C  &as LS(V) V  &as LS(B) B      &as LS(N) N  &as LS(M) M  &kp LCTL        &kp RALT        &as LS(DOT) DOT
+                &as LS(Q) Q  &as LS(W) W  &as LS(E) E  &as LS(R) R  &as LS(T) T      &as LS(Y) Y  &as LS(U) U  &as LS(I) I      &as LS(O) O    &as LS(P) P
+                &as LS(A) A  &as LS(S) S  &as LS(D) D  &as LS(F) F  &as LS(G) G      &as LS(H) H  &as LS(J) J  &as LS(K) K      &as LS(L) L    &as LS(SEMI) SEMI
+                &as LS(Z) Z  &as LS(X) X  &as LS(C) C  &as LS(V) V  &as LS(B) B      &as LS(N) N  &as LS(M) M  &as LS(COMMA) COMMA  &as LS(DOT) DOT  &as LS(FSLH) FSLH
                                           &kp LGUI     &mo 1        &kp SPACE       &as LS(RET) RET  &mo 2    &kp BSPC
             >;
         };
 
-        lower_layer {
+        nav_layer {
+            // F-row in the same columns as Q-P. Arrows on H J K L. Mods for Ctrl/Alt/Shift.
             // -----------------------------------------------------------------------------------------
-            // | !     |  @  |  #  |  $  |  %  |     |  ^  |  &  |  *  |  (  |  )  |
-            // | BT1   | BT2 | BT3 | BT4 | BT5 |     | LFT | DWN |  UP | RGT |     |
-            // | BTCLR |     |     |     |     |     |     |     |     |     |     |
-            //               | GUI |     | SPC |     | ENT | ESC | TAB |
-            display-name = "Lower";
+            // | F1 | F2 | F3 | F4 | F5 |     | F6 | F7 | F8 | F9 | F10 |
+            // | SFT| CTL| ALT| GUI| CLR|     | ←  | ↓  | ↑  | →  | F11 |
+            // | BT0| BT1| BT2| BT3| BT4|     |HOME| PGDN|PGUP| END| F12 |
+            //            | GUI |    | SPC |     | ENT | ESC | TAB |
+            display-name = "Nav";
             bindings = <
-                &kp EXCL      &kp AT        &kp HASH      &kp DLLR      &kp PRCNT       &kp CARET  &kp AMPS  &kp KP_MULTIPLY  &kp LPAR  &kp RPAR
-                &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &bt BT_SEL 4    &kp LEFT   &kp DOWN  &kp UP           &kp RIGHT &trans
-                &bt BT_CLR    &trans        &trans        &trans        &trans          &trans     &trans    &trans           &trans    &trans
-                                            &kp LGUI      &trans        &kp SPACE       &as LS(RET) RET  &kp ESC  &kp TAB
+                &kp F1       &kp F2       &kp F3       &kp F4       &kp F5          &kp F6    &kp F7    &kp F8    &kp F9     &kp F10
+                &sk LSHFT    &sk LCTRL    &sk LALT     &kp LGUI     &bt BT_CLR      &kp LEFT  &kp DOWN  &kp UP    &kp RIGHT  &kp F11
+                &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4    &kp HOME  &kp PG_DN &kp PG_UP &kp END    &kp F12
+                                          &kp LGUI     &trans       &kp SPACE       &as LS(RET) RET  &kp ESC  &kp TAB
             >;
         };
 
-        raise_layer {
+        num_layer {
+            // Number row in the same columns as Q-P. Remaining QWERTY keys on home row.
+            // Hold a number for its shifted symbol: ! @ # $ % ^ & * ( )
             // -----------------------------------------------------------------------------------------
-            // | 1! |  2@ |  3# |  4$ |  5% |     |  6^ |  7& |  8* |  9(  |  0)  |
-            // | -_ |  =+ |  {  |  [  |  (  |     |  )  |  ]  |  }  |  /?  |  \|  |
-            // | `~ |     |     |  ,< |  :  |     |  ;  |  .> | CTRL| META |      |
-            //            | GUI | ESC | SPC |     | ENT |     | TAB |
-            display-name = "Raise";
+            // | 1 | 2 | 3 | 4 | 5 |     | 6 | 7 | 8 | 9 | 0 |
+            // | ` | - | = | [ | ] |     | \ | ' |TAB|ESC|DEL|
+            // |PP |PRV|NXT|MUT| VD|     | VU|   | , | . | / |
+            //           | GUI | ESC | SPC |     | ENT |    | TAB |
+            display-name = "Num";
             bindings = <
-                &as LS(N1) N1        &as LS(N2) N2     &as LS(N3) N3     &as LS(N4) N4     &as LS(N5) N5       &as LS(N6) N6  &as LS(N7) N7  &as LS(N8) N8  &as LS(N9) N9  &as LS(N0) N0
-                &as LS(MINUS) MINUS  &as LS(EQUAL) EQUAL  &kp LBRC       &kp LBKT          &kp LPAR            &kp RPAR       &kp RBKT       &kp RBRC       &as LS(FSLH) FSLH  &as LS(BSLH) BSLH
-                &as LS(GRAVE) GRAVE  &trans            &trans           &as LS(COMMA) COMMA  &kp COLON         &kp SEMI       &as LS(DOT) DOT  &kp LCTRL     &kp RALT        &trans
-                                                       &kp LGUI         &kp ESC           &kp SPACE           &as LS(RET) RET  &trans        &kp TAB
+                &as LS(N1) N1        &as LS(N2) N2        &as LS(N3) N3        &as LS(N4) N4        &as LS(N5) N5          &as LS(N6) N6  &as LS(N7) N7  &as LS(N8) N8        &as LS(N9) N9  &as LS(N0) N0
+                &as LS(GRAVE) GRAVE  &as LS(MINUS) MINUS  &as LS(EQUAL) EQUAL  &as LS(LBKT) LBKT    &as LS(RBKT) RBKT      &as LS(BSLH) BSLH  &as LS(SQT) SQT  &kp TAB  &kp ESC  &kp DEL
+                &kp C_PP             &kp C_PREV           &kp C_NEXT          &kp C_MUTE           &kp C_VOL_DN           &kp C_VOL_UP   &trans         &as LS(COMMA) COMMA  &as LS(DOT) DOT  &as LS(FSLH) FSLH
+                                                          &kp LGUI            &kp ESC              &kp SPACE              &as LS(RET) RET  &trans       &kp TAB
             >;
         };
 
