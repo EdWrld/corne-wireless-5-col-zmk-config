@@ -94,10 +94,6 @@
             layers = <BASE>;
             bindings = <&kp ESC>;
         };
-        combo_enter {
-          time
-        } 
-
     };
 
     // Hold both layer thumbs (Space/Nav + Enter/Symbols) for the Adjust layer.
@@ -118,15 +114,14 @@
             // | Q/T | W   | E   | R   | T   |     |  Y  |  U  |  I  |  O  |  P  |   Q/T = Tab on hold
             // | A/C | S   | D   | F   | G   |     |  H  |  J  |  K  |  L  |  ;  |   A/C = Ctrl on hold
             // | Z/S | X   | C   | V   | B   |     |  N  |  M  |  ,  |  .  | /-C |   Z/S = Shift, /-C = Ctrl
-            //             | SFT | ESC | ENT |     |     | SPC |BSPC |
-            //             |     | CTL | SYM |     | NAV |     |     |
+            //             | SFT | ESC | ENT |     |     |BSPC | SPC |
+            //             |     | ALT | SYM |     | NAV |     |     |
             display-name = "Base";
             bindings = <
-                &hm TAB Q        &kp W            &kp E             &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P
+                &kp Q        &kp W            &kp E             &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P
                 &hm LCTRL A      &kp S            &kp D             &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &hm RCTRL SEMI
                 &hm LSHFT Z      &kp X            &kp C             &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &hm RSHFT FSLH
-                                          &kp LSHFT        &lt_fast TAB SYM   &lt_fast RET LALT        &kp SPACE  &mo NAV    &kp BSPC
-
+                               &kp LSHFT        &lt_fast SYM TAB  &lt_fast SYM RET            &kp SPACE  &mo NAV    &kp BSPC   
             >;
         };
 
@@ -139,7 +134,7 @@
             // |W<- |W-> |SPL-|SPL||ZOOM|     |HOME |PGDN |PGUP |END | F12 |
             //             |TAB |CTL |ADJ |     |    |    |DEL |
             display-name = "Nav";
-            bindings = 
+            bindings = <
                 &kp N1         &kp N2         &kp N3      &kp N4      &kp N5           &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
                 &kp LC(H)      &kp LC(J)      &kp LC(K)   &kp LC(L)   &kp LC(SPACE)    &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT  &kp F11
                 &kp LA(LS(H))  &kp LA(LS(L))  &tmux_below &tmux_right &tmux_zoom       &kp HOME   &kp PG_DN  &kp PG_UP  &kp END    &kp F12
