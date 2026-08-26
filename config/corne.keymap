@@ -30,8 +30,9 @@
             bindings = <&mo>, <&kp>;
         };
 
-        // Letter-key holds: Q -> Tab, A -> Alt, Z -> Shift. All left pinky column,
-        // so no two of them combine. require-prior-idle-ms is the key setting:
+        // Letter-key holds: Q -> Tab, A -> Ctrl, Z -> Shift, / -> Ctrl. The left three
+        // share the pinky column so no two of them combine; / is the right-hand Ctrl
+        // that covers those cases. require-prior-idle-ms is the key setting:
         // if any key was pressed within 150 ms the hold is disabled outright, so
         // mid-word rolls resolve as plain letters and never leak a modifier.
         hm: home_row_mod {
@@ -111,16 +112,16 @@
             // 5-column US QWERTY: the 10 columns under Q-P, including ; , . /
             // -----------------------------------------------------------------------------------------
             // | Q/T | W   | E   | R   | T   |     |  Y  |  U  |  I  |  O  |  P  |   Q/T = Tab on hold
-            // | A/A | S   | D   | F   | G   |     |  H  |  J  |  K  |  L  |  ;  |   A/A = Alt on hold
-            // | Z/S | X   | C   | V   | B   |     |  N  |  M  |  ,  |  .  |  /  |   Z/S = Shift on hold
+            // | A/C | S   | D   | F   | G   |     |  H  |  J  |  K  |  L  |  ;  |   A/C = Ctrl on hold
+            // | Z/S | X   | C   | V   | B   |     |  N  |  M  |  ,  |  .  | /-C |   Z/S = Shift, /-C = Ctrl
             //             | SFT | ESC | ENT |     |     | SPC |BSPC |
             //             |     | CTL | SYM |     | NAV |     |     |
             display-name = "Base";
             bindings = <
                 &hm TAB Q        &kp W            &kp E             &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P
-                &hm LALT A       &kp S            &kp D             &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &kp SEMI
-                &hm LSHFT Z      &kp X            &kp C             &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &kp FSLH
-                               &kp LSHFT         &mt_slow LCTRL ESC  &lt_fast SYM RET         &mo NAV    &kp SPACE  &kp BSPC
+                &hm LCTRL A      &kp S            &kp D             &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &kp SEMI
+                &hm LSHFT Z      &kp X            &kp C             &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &hm LCTRL FSLH
+                               &kp LSHFT         &mt_slow LALT ESC   &lt_fast SYM RET         &mo NAV    &kp SPACE  &kp BSPC
 
             >;
         };

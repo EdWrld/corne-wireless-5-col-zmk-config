@@ -14,28 +14,28 @@ two keys away.
 
 ## Layer 0 — Base
 
-Plain US QWERTY, with three letter-key holds on the left pinky column: **`Q` is `Tab`,
-`A` is `Alt`, `Z` is `Shift`**. Every other modifier and every layer lives on a thumb.
-There is no `GUI` anywhere.
+Plain US QWERTY, with four letter-key holds: **`Q` is `Tab`, `A` is `Ctrl`, `Z` is
+`Shift`** on the left pinky column, and **`/` is `Ctrl`** on the right pinky. Every
+other modifier and every layer lives on a thumb. There is no `GUI` anywhere.
 
 ```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │  Q/⇥  │   W   │   E   │   R   │   T   │   │   Y   │   U   │   I   │   O   │   P   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│  A/⎇  │   S   │   D   │   F   │   G   │   │   H   │   J   │   K   │   L   │   ;   │
+│  A/^  │   S   │   D   │   F   │   G   │   │   H   │   J   │   K   │   L   │   ;   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│  Z/⇧  │   X   │   C   │   V   │   B   │   │   N   │   M   │   ,   │   .   │   /   │
+│  Z/⇧  │   X   │   C   │   V   │   B   │   │   N   │   M   │   ,   │   .   │  /-^  │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
                 │       │  ESC  │  ENT  │   │       │  SPC  │ BSPC  │
-                │ Shift │ Ctrl  │  Sym  │   │  Nav  │       │       │
+                │ Shift │  Alt  │  Sym  │   │  Nav  │       │       │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
 In the thumb block the **upper label is the tap, the lower is the hold**. A blank row
 means the key does nothing there.
 
-Only two thumbs are genuinely tap/hold: `Esc`/`Ctrl` and `Enter`/`Sym`. The other four
+Only two thumbs are genuinely tap/hold: `Esc`/`Alt` and `Enter`/`Sym`. The other four
 are single-purpose. `Space` and `Backspace` are plain `&kp`, so they auto-repeat
 normally and can never leak a layer — that is precisely why neither layer thumb sits
 on them. `Shift` is a plain `&kp` as well, and `Nav` is a bare `&mo` with no tap at
@@ -44,14 +44,15 @@ all, so neither has a tapping term that could misfire.
 | Thumb | Tap | Hold |
 | --- | --- | --- |
 | Left outer | — | `Shift` |
-| Left middle | `Esc` | `Ctrl` |
+| Left middle | `Esc` | `Alt` |
 | Left inner | `Enter` | Layer 2 — Symbols |
 | Right inner | — | Layer 1 — Nav |
 | Right middle | `Space` | — |
 | Right outer | `Backspace` | — |
 
-`Q/⇥`, `A/⎇` and `Z/⇧` are the only letter keys with holds — tap for the letter, hold
-for `Tab`, `Alt` and `Shift`. See **Letter-key holds** below.
+`Q/⇥`, `A/^`, `Z/⇧` and `/-^` are the only keys with holds outside the thumbs — tap for
+the character, hold for `Tab`, `Ctrl`, `Shift` and `Ctrl`. See **Letter-key holds**
+below.
 
 **Combo:** `J` + `K` pressed together → `Esc`. Base layer only, 50 ms window.
 
@@ -75,8 +76,10 @@ the tmux / pane cluster.
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
-`·` falls through to the base layer, so `Ctrl` and `Shift` stay available while
-navigating. `▓▓▓` is the thumb you are holding to reach this layer; `ADJ` is the Sym
+`·` falls through to the base layer, so the thumb `Alt` and thumb `Shift` stay
+available while navigating. `Ctrl` does **not** — this layer remaps `A` to
+`Ctrl+H` and `/` to `F12`. To use `Ctrl` with Nav, hold `A` or `/` first, let it
+resolve to `Ctrl`, and only then reach for the Nav thumb. `▓▓▓` is the thumb you are holding to reach this layer; `ADJ` is the Sym
 thumb — hold that one too and you land on Layer 3.
 
 ### Right hand — movement
@@ -92,8 +95,9 @@ thumb — hold that one too and you land on Layer 3.
 | Numbers | `Nav` + `Q`…`P` |
 | F11 / F12 | `Nav` + `;` / `/` |
 
-Select-by-word is the one awkward motion: `Ctrl` and `Shift` are both on the left
-thumb, on adjacent keys, so it needs a thumb roll. See **Hold-tap tuning** below.
+Move-by-word and select-by-word both need `Ctrl`, which is overwritten on this layer.
+Hold `A` or `/` **before** the Nav thumb for either to work. See **Letter-key holds**
+below.
 
 ### Left hand — tmux and panes
 
@@ -110,11 +114,10 @@ thumb, on adjacent keys, so it needs a thumb roll. See **Hold-tap tuning** below
 The bottom three are ZMK macros — they send the prefix and the following key with
 30 ms between them, so tmux sees a normal prefix sequence.
 
-Why `Ctrl+H/J/K/L` lives here rather than just holding the Ctrl thumb: the Ctrl
-thumb is `tap-preferred` at 220 ms, so pressing `H` before the term expires yields
-**Esc then h**, not a pane switch. The Nav thumb is a bare `&mo` with no tap and no
-tapping term, so it engages the moment it goes down — pane movement is instant and
-cannot misfire.
+Why `Ctrl+H/J/K/L` is baked in here as `&kp LC(H)` rather than composed from a live
+`Ctrl`: there is no `Ctrl` available on this layer at all. Both `Ctrl` keys, `A` and
+`/`, are themselves remapped by this layer. Baking the combination in means
+pane movement is one thumb plus one finger, instant and misfire-proof.
 
 Pane movement crossing the nvim/tmux boundary also needs `vim-tmux-navigator`
 installed on the **nvim** side, not just in `~/.tmux.conf`. Without it, `Ctrl+H`
@@ -200,28 +203,27 @@ Two behaviours, deliberately tuned differently:
 | Behaviour | Used on | Flavor | Tapping term | Quick tap |
 | --- | --- | --- | --- | --- |
 | `lt_fast` | Enter/Sym | `hold-preferred` | 200 ms | 175 ms |
-| `mt_slow` | Esc/Ctrl | `tap-preferred` | 220 ms | 175 ms |
-| `hm` | Q/Tab, A/Alt, Z/Shift | `balanced` | 200 ms | 175 ms |
+| `mt_slow` | Esc/Alt | `tap-preferred` | 220 ms | 175 ms |
+| `hm` | Q/Tab, A/Ctrl, Z/Shift, //Ctrl | `balanced` | 200 ms | 175 ms |
 
 Only two thumbs are hold-taps at all now. `Sym` uses `hold-preferred` so the layer
 engages the instant another key is pressed — no waiting on the tapping term mid-word.
-The `Ctrl` thumb uses `tap-preferred`, which only engages the modifier after the term
-expires, so a quick tap can never leak a stray Ctrl into an editor.
+The `Alt` thumb uses `tap-preferred`, which only engages the modifier after the term
+expires, so a quick tap can never leak a stray Alt into an editor.
 
 `Nav` is a plain `&mo` and `Shift`, `Space` and `Backspace` are plain `&kp`, so four
 of the six thumbs have no timing behaviour whatsoever.
-
-**Known edge case:** `Ctrl` + `Shift` puts both mods on the left thumb across two
-adjacent keys. `Ctrl+Shift+Nav+H/L` (select by word) needs a thumb roll. If it bites,
-add a combo rather than moving to home-row mods.
 
 ---
 
 ## Letter-key holds
 
-`Q` held is `Tab`, `A` held is `Alt`, `Z` held is `Shift`. `Alt` is here because it has
-no other home. `Tab` is here because it lost its base-layer thumb in the redesign.
-`Shift` is a convenience duplicate — the thumb `Shift` remains the primary one.
+`Q` held is `Tab`, `A` held is `Ctrl`, `Z` held is `Shift`, `/` held is `Ctrl`.
+
+`Ctrl` is deliberately on both hands. The three left-hand holds all share the pinky
+column, so none of them can combine with each other — `/` is the right-hand `Ctrl`
+that covers exactly those cases. Reach for `/` when the target is on the left hand,
+`A` when it is on the right.
 
 All three use the `hm` behaviour, whose important setting is `require-prior-idle-ms = 150`:
 if any key was pressed within the last 150 ms the hold is **disabled entirely**, so
@@ -235,15 +237,23 @@ enough and you get several tabs, not one.
 **All three sit in the left pinky column, so no two of them can ever combine**, and
 none can modify a letter in its own column. The thumbs cover every case they cannot:
 
+A key cannot be its own modifier, and two keys in the same finger column cannot be
+held together. Every such case now has a fallback:
+
 | Want | Cannot do | Use instead |
 | --- | --- | --- |
-| `Alt+Tab` | `A` and `Q` are the same finger | `A` for Alt, then `Nav` + left outer thumb |
-| `Shift+Tab` | `Z` and `Q` are the same finger | thumb `Shift` + hold `Q` |
+| `Ctrl+A` (select all) | `A` is a `Ctrl` key | hold `/` |
+| `Ctrl+Z` (undo) | `A` and `Z`, same finger | hold `/` |
+| `Ctrl+Q` (quit) | `A` and `Q`, same finger | hold `/` |
+| `Ctrl+/` (comment) | `/` is a `Ctrl` key | hold `A` |
+| `Shift+Tab` | `Z` and `Q`, same finger | thumb `Shift` + hold `Q` |
 | Capital `Q`, `A`, `Z` | `Z` cannot shift its own column | thumb `Shift` |
-| `Alt+A` | a key cannot be its own modifier | nothing — no other `Alt` exists |
 
-That is why `Tab` stays on the Nav layer too: it is the only `Tab` that composes with
-`Alt`. A dedicated `&kp LA(TAB)` combo would be the cleaner fix if you use it often.
+`Ctrl+C`, `Ctrl+V`, `Ctrl+X`, `Ctrl+S` and the rest work from either `Ctrl`.
+
+**Neither `Ctrl` is live on the Nav layer** — that layer remaps `A` to `Ctrl+H` and `/`
+to `F12`. For move-by-word or select-by-word, hold the `Ctrl` key **first**, let it
+resolve, then reach for the Nav thumb.
 
 ---
 
