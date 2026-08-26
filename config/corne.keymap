@@ -55,6 +55,19 @@
             quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
         };
+
+        // Top-row holds: Q..P -> 1..0. tap-preferred so any roll during the term
+        // resolves as the letter, and require-prior-idle-ms disables the hold
+        // outright within 150 ms of another key, so mid-word holds never digit.
+        nt: number_tap {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
+            flavor = "tap-preferred";
+            tapping-term-ms = <200>;
+            quick-tap-ms = <175>;
+            require-prior-idle-ms = <150>;
+            bindings = <&kp>, <&kp>;
+        };
     };
 
     // tmux prefix is C-Space (see ~/.tmux.conf). These fire prefix-then-key.
@@ -108,19 +121,18 @@
 
     keymap {
         compatible = "zmk,keymap";
-
         default_layer {
             // 5-column US QWERTY: the 10 columns under Q-P, including ; , . /
             // Thumb rows read: upper = tap, lower = hold.
             // -----------------------------------------------------------------------------------------
-            // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  |  O  |  P  |
+            // | Q/1 | W/2 | E/3 | R/4 | T/5 |     | Y/6 | U/7 | I/8 | O/9 | P/0 |   Q/1 .. P/0 = digit on hold
             // | A/C |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | ;/C |   A/C ;/C = Ctrl on hold
             // | Z/S |  X  |  C  |  V  |  B  |     |  N  |  M  |  ,  |  .  | //S |   Z/S //S = Shift on hold
             //             | SFT | TAB | ENT |     | SPC | NAV |BSPC |
             //             |     | SYM | ALT |     |     |     |     |
             display-name = "Base";
             bindings = <
-                &kp Q        &kp W            &kp E             &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P
+                &nt N1 Q     &nt N2 W         &nt N3 E          &nt N4 R   &nt N5 T       &nt N6 Y   &nt N7 U   &nt N8 I   &nt N9 O   &nt N0 P
                 &hm LCTRL A      &kp S            &kp D             &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &hm RCTRL SEMI
                 &hm LSHFT Z      &kp X            &kp C             &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &hm RSHFT FSLH
                                &kp LSHFT        &lt_fast SYM TAB  &mt_slow LALT RET            &kp SPACE  &mo NAV    &kp BSPC   

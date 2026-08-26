@@ -22,9 +22,14 @@ Plain US QWERTY, with four pinky-column holds, mirrored across the hands: **`A` 
 on the right. Every other modifier and every layer lives on a thumb. There is no `GUI`
 anywhere.
 
+The **top row doubles as the number row on hold**: `Q`..`P` send `1`..`0`. Same guard
+as the pinky mods — `tap-preferred` flavor plus a 150 ms `require-prior-idle-ms`, so a
+hold inside a word always resolves as the letter. The Nav layer keeps its own digit row
+for runs of numbers; these holds are for one-off digits without a layer change.
+
 ```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
-│   Q   │   W   │   E   │   R   │   T   │   │   Y   │   U   │   I   │   O   │   P   │
+│  Q/1  │  W/2  │  E/3  │  R/4  │  T/5  │   │  Y/6  │  U/7  │  I/8  │  O/9  │  P/0  │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │  A/^  │   S   │   D   │   F   │   G   │   │   H   │   J   │   K   │   L   │  ;/^  │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
