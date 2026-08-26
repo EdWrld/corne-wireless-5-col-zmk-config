@@ -7,6 +7,12 @@
 #include <behaviors.dtsi>
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
+#include <dt-bindings/zmk/outputs.h>
+
+#define BASE 0
+#define NAV  1
+#define SYM  2
+#define ADJ  3
 
 / {
     chosen {
@@ -14,35 +20,73 @@
     };
 
     behaviors {
-        as: auto_shift {
+        // Layer thumbs: switch to the layer as soon as another key is pressed.
+        lt_fast: layer_tap_fast {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
+            flavor = "hold-preferred";
             tapping-term-ms = <200>;
-            quick-tap-ms = <0>;
+            quick-tap-ms = <175>;
+            bindings = <&mo>, <&kp>;
+        };
+
+        // Modifier thumbs: conservative, so a fast tap never leaks a modifier.
+        mt_slow: mod_tap_slow {
+            compatible = "zmk,behavior-hold-tap";
+            #binding-cells = <2>;
             flavor = "tap-preferred";
+            tapping-term-ms = <220>;
+            quick-tap-ms = <175>;
             bindings = <&kp>, <&kp>;
+        };
+    };
+
+    // tmux prefix is C-Space (see ~/.tmux.conf). These fire prefix-then-key.
+    macros {
+        tmux_below: tmux_below {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&kp LC(SPACE)>, <&kp DQT>;
+        };
+
+        tmux_right: tmux_right {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&kp LC(SPACE)>, <&kp PRCNT>;
+        };
+
+        tmux_zoom: tmux_zoom {
+            compatible = "zmk,behavior-macro";
+            #binding-cells = <0>;
+            wait-ms = <30>;
+            tap-ms = <30>;
+            bindings = <&kp LC(SPACE)>, <&kp Z>;
         };
     };
 
     combos {
         compatible = "zmk,combos";
 
-        // Home-row J+K (positions 16 and 17) → Escape. Base layer only.
+        // Home-row J+K (positions 16 and 17) -> Escape. Base layer only.
         combo_esc {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
             key-positions = <16 17>;
-            layers = <0>;
+            layers = <BASE>;
             bindings = <&kp ESC>;
         };
     };
 
-    // Hold Nav + Num together to get the Func layer (F-keys).
+    // Hold both layer thumbs (Space/Nav + Enter/Symbols) for the Adjust layer.
     conditional_layers {
         compatible = "zmk,conditional-layers";
-        func_layer {
-            if-layers = <1 2>;
-            then-layer = <3>;
+        nav_sym_to_adj {
+            if-layers = <NAV SYM>;
+            then-layer = <ADJ>;
         };
     };
 
@@ -55,71 +99,73 @@
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  |  O  |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  |  ;  |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  |  ,  |  .  |  /  |
-            //             | GUI | ESC | SPC |     | ENT | NUM | BSPC |
-            //                   | NAV |
+            //             | SFT | ESC | ENT |     |     | SPC |BSPC |
+            //             |     | CTL | SYM |     | NAV |     |     |
             display-name = "Base";
             bindings = <
-                &as LS(Q) Q  &as LS(W) W  &as LS(E) E  &as LS(R) R  &as LS(T) T      &as LS(Y) Y  &as LS(U) U  &as LS(I) I      &as LS(O) O    &as LS(P) P
-                &as LS(A) A  &as LS(S) S  &as LS(D) D  &as LS(F) F  &as LS(G) G      
-                &kp H        &kp J        &kp K            &kp L          &as LS(SEMI) SEMI
-                &as LS(Z) Z  &as LS(X) X  &as LS(C) C  &as LS(V) V  &as LS(B) B      &as LS(N) N  &as LS(M) M  &as LS(COMMA) COMMA  &as LS(DOT) DOT  &as LS(FSLH) FSLH
-                                          &kp LGUI     &lt 1 ESC    &kp SPACE       &as LS(RET) RET  &mo 2    &kp BSPC
+                &kp Q            &kp W            &kp E             &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P
+                &kp A            &kp S            &kp D             &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &kp SEMI
+                &kp Z            &kp X            &kp C             &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &kp FSLH
+                                                  &kp LSHFT  &mt_slow LCTRL ESC  &lt_fast SYM RET    &mo NAV    &kp SPACE  &kp BSPC
             >;
         };
 
         nav_layer {
-            // Right Alt+number in the same columns as 1-0 / Q-P (AHK screen switcher).
+            // Hold the right inner Navigation thumb.
+            // Left hand is the tmux / pane cluster, right hand is movement.
             // -----------------------------------------------------------------------------------------
-            // |A1 | A2 | A3 | A4 | A5 |     | A6 | A7 | A8 | A9 | A0 |
-            // |SFT| CTL| ALT|RALT| CLR|     | ←  | ↓  | ↑  | →  |A- |
-            // |BT0| BT1| BT2| BT3| BT4|     |HOME|PGDN|PGUP| END|A= |
-            //            | GUI |    | SPC |     | ENT | ESC | TAB |
+            // | 1  | 2  | 3  | 4  | 5  |     | 6   | 7   | 8   | 9  | 0   |
+            // |^H  |^J  |^K  |^L  |PFX |     | <-  | v   | ^   | -> | F11 |
+            // |W<- |W-> |SPL-|SPL||ZOOM|     |HOME |PGDN |PGUP |END | F12 |
+            //             |TAB |CTL |ADJ |     |    |    |DEL |
             display-name = "Nav";
             bindings = <
-                &kp RA(N1)   &kp RA(N2)   &kp RA(N3)   &kp RA(N4)   &kp RA(N5)      &kp RA(N6) &kp RA(N7) &kp RA(N8) &kp RA(N9)  &kp RA(N0)
-                &sk LSHFT    &sk LCTRL    &sk LALT     &sk RALT     &bt BT_CLR      &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT   &kp RA(MINUS)
-                &bt BT_SEL 0 &bt BT_SEL 1 &bt BT_SEL 2 &bt BT_SEL 3 &bt BT_SEL 4    &kp HOME   &kp PG_DN  &kp PG_UP  &kp END     &kp RA(EQUAL)
-                                          &kp LGUI     &trans       &kp SPACE       &as LS(RET) RET  &kp ESC  &kp TAB
+                &kp N1         &kp N2         &kp N3      &kp N4      &kp N5           &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
+                &kp LC(H)      &kp LC(J)      &kp LC(K)   &kp LC(L)   &kp LC(SPACE)    &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT  &kp F11
+                &kp LA(LS(H))  &kp LA(LS(L))  &tmux_below &tmux_right &tmux_zoom       &kp HOME   &kp PG_DN  &kp PG_UP  &kp END    &kp F12
+                                              &kp TAB     &trans      &trans           &trans     &trans     &kp DEL
             >;
         };
 
-        num_layer {
-            // Number row in the same columns as Q-P. Remaining QWERTY keys on home row.
-            // Hold a number for its shifted symbol: ! @ # $ % ^ & * ( )
+        sym_layer {
+            // Hold the left inner Symbols thumb (Enter).
+            // Top row mirrors the shifted number row. Every bracket pair is one-handed:
+            // parens and brackets on the left, braces on the right.
             // -----------------------------------------------------------------------------------------
-            // | 1 | 2 | 3 | 4 | 5 |     | 6 | 7 | 8 | 9 | 0 |
-            // | ` | - | = | [ | ] |     | \ | ' |TAB|ESC|DEL|
-            // |PP |PRV|NXT|MUT| VD|     | VU|   | , | . | / |
-            //           | GUI | ESC | SPC |     | ENT |    | TAB |
-            display-name = "Num";
+            // | ! | @ | # | $ | % |     | ^ | & | * | ? | \ |
+            // | ( | ) | [ | ] | = |     | { | } | | | " | ' |
+            // | - | _ | ` | ~ | + |     | : | ; | < | > |   |
+            //             |SFT |CTL |   |     |ADJ |    |    |
+            display-name = "Sym";
             bindings = <
-                &as LS(N1) N1        &as LS(N2) N2        &as LS(N3) N3        &as LS(N4) N4        &as LS(N5) N5          &as LS(N6) N6  &as LS(N7) N7  &as LS(N8) N8        &as LS(N9) N9  &as LS(N0) N0
-                &as LS(GRAVE) GRAVE  &as LS(MINUS) MINUS  &as LS(EQUAL) EQUAL  &as LS(LBKT) LBKT    &as LS(RBKT) RBKT      &as LS(BSLH) BSLH  &as LS(SQT) SQT  &kp TAB  &kp ESC  &kp DEL
-                &kp C_PP             &kp C_PREV           &kp C_NEXT          &kp C_MUTE           &kp C_VOL_DN           &kp C_VOL_UP   &trans         &as LS(COMMA) COMMA  &as LS(DOT) DOT  &as LS(FSLH) FSLH
-                                                          &kp LGUI            &kp ESC              &kp SPACE              &as LS(RET) RET  &trans       &kp TAB
+                &kp EXCL   &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp CARET  &kp AMPS   &kp STAR   &kp QMARK  &kp BSLH
+                &kp LPAR   &kp RPAR   &kp LBKT   &kp RBKT   &kp EQUAL     &kp LBRC   &kp RBRC   &kp PIPE   &kp DQT    &kp SQT
+                &kp MINUS  &kp UNDER  &kp GRAVE  &kp TILDE  &kp PLUS      &kp COLON  &kp SEMI   &kp LT     &kp GT     &trans
+                                      &trans     &trans     &trans        &trans     &trans     &trans
             >;
         };
 
-        func_layer {
-            // Hold Nav + Num together. F-row in the same columns as Q-P.
+        adjust_layer {
+            // Hold Sym (left inner) + Nav (right inner). Radios, output, and the F-row.
             // -----------------------------------------------------------------------------------------
-            // | F1 | F2 | F3 | F4 | F5 |     | F6 | F7 | F8 | F9 | F10 |
-            // |    |    |    |    |    |     |    |    |    |    | F11 |
-            // |    |    |    |    |    |     |    |    |    |    | F12 |
-            display-name = "Func";
+            // |A1  |A2  |A3  |A4  |A5  |     |A6 |A7 |A8 |A9 |A0 |
+            // |BT0 |BT1 |BT2 |BT3 |BT4 |     |F1 |F2 |F3 |F4 |F5 |
+            // |CLR |USB |BLE |RST |BOOT|     |F6 |F7 |F8 |F9 |F10|
+            //             |    |    |    |     |   |A- |A= |
+            display-name = "Adj";
             bindings = <
-                &kp F1    &kp F2    &kp F3    &kp F4    &kp F5       &kp F6    &kp F7    &kp F8    &kp F9    &kp F10
-                &trans    &trans    &trans    &trans    &trans       &trans    &trans    &trans    &trans    &kp F11
-                &trans    &trans    &trans    &trans    &trans       &trans    &trans    &trans    &trans    &kp F12
-                                    &trans    &trans    &trans       &trans    &trans    &trans
+                &kp RA(N1)    &kp RA(N2)    &kp RA(N3)    &kp RA(N4)   &kp RA(N5)     &kp RA(N6) &kp RA(N7)     &kp RA(N8)     &kp RA(N9) &kp RA(N0)
+                &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3 &bt BT_SEL 4   &kp F1     &kp F2         &kp F3         &kp F4     &kp F5
+                &bt BT_CLR    &out OUT_USB  &out OUT_BLE  &sys_reset   &bootloader    &kp F6     &kp F7         &kp F8         &kp F9     &kp F10
+                                            &trans        &trans       &trans         &trans     &kp RA(MINUS)  &kp RA(EQUAL)
             >;
         };
 
-        extra_2 {
+        extra_1 {
             status = "reserved";
         };
 
-        extra_3 {
+        extra_2 {
             status = "reserved";
         };
     };
