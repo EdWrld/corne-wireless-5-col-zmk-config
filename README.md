@@ -9,6 +9,9 @@ two keys away.
 - Keymap: [`config/corne.keymap`](config/corne.keymap)
 - Firmware options: [`config/corne.conf`](config/corne.conf)
 - Build matrix: [`build.yaml`](build.yaml)
+- Cheat sheet overlay: [`tools/keymap-overlay`](tools/keymap-overlay) — an
+  always-on-top window rendered straight from the keymap, for learning the
+  layers (`./tools/keymap-overlay/zmk-cheatsheet`)
 
 ---
 
