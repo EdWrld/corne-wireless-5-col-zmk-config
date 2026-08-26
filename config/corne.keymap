@@ -144,19 +144,20 @@
         };
 
         sym_layer {
-            // Hold the lefr inner Symbols thumb (Enter).
-            // Top row mirrjrs the shifted number row. Every bracket pair is one-handed:
-            // parens and brackets on the left, braces on the right.
-            // ------------r----------------------------------------------------------------------------
-            // | ! | @ | # | $ | % |     | ^ | & | * | ? | \ |
-            // | ( | ) | [ | ] | = |     | { | } | | | " | ' |
-            // | - | _ | ` | ~ | + |     | : | ; | < | > |   |
-            //             |SFT |CTL |   |     |ADJ |    |    |
+            // Hold the left inner Symbols thumb (Enter).
+            // Right hand = symbols that appear in sequences, placed so that no common
+            // pair lands on the same finger. Left hand = symbols typed alone.
+            // - and _ stay left so that -> and += are cross-hand alternations.
+            // -----------------------------------------------------------------------------------------
+            // |   | @ | # | $ | % |     | ? | [ | ] | { | } |
+            // | ' | " | ` | ~ | \ |     | ! | ( | = | ) | : |
+            // | - | _ | + | ^ |   |     | & | | | < | > | * |
+            //             |SFT |ALT |   |     |ADJ |    |    |
             display-name = "Sym";
             bindings = <
-                &kp EXCL   &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp CARET  &kp AMPS   &kp STAR   &kp QMARK  &kp BSLH
-                &kp LPAR   &kp RPAR   &kp LBKT   &kp RBKT   &kp EQUAL     &kp LBRC   &kp RBRC   &kp PIPE   &kp DQT    &kp SQT
-                &kp MINUS  &kp UNDER  &kp GRAVE  &kp TILDE  &kp PLUS      &kp COLON  &kp SEMI   &kp LT     &kp GT     &trans
+                &trans     &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp QMARK  &kp LBKT   &kp RBKT   &kp LBRC   &kp RBRC
+                &kp SQT    &kp DQT    &kp GRAVE  &kp TILDE  &kp BSLH      &kp EXCL   &kp LPAR   &kp EQUAL  &kp RPAR   &kp COLON
+                &kp MINUS  &kp UNDER  &kp PLUS   &kp CARET  &trans        &kp AMPS   &kp PIPE   &kp LT     &kp GT     &kp STAR
                                       &trans     &trans     &trans        &trans     &trans     &trans
             >;
         };

@@ -129,42 +129,58 @@ stops at nvim's edge instead of handing off to the tmux pane next door.
 
 Hold the **Enter / Symbols** thumb (left inner).
 
-The top row mirrors the shifted number row of a normal keyboard, so `!@#$%` sits
-exactly where your fingers already expect it. Every bracket pair is typed with a
-single hand: parens and brackets on the left, braces on the right.
+Split by **how a symbol is typed, not by what it is**. The right hand holds everything
+that appears in a sequence — brackets, operators, comparisons — laid out so no common
+pair lands on the same finger. The left hand holds everything you type in isolation.
+
+`-` and `_` stay on the left deliberately, so `->` and `+=` become cross-hand
+alternations, which are faster than any same-hand roll.
 
 ```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
-│   !   │   @   │   #   │   $   │   %   │   │   ^   │   &   │   *   │   ?   │   \   │
+│   ·   │   @   │   #   │   $   │   %   │   │   ?   │   [   │   ]   │   {   │   }   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   (   │   )   │   [   │   ]   │   =   │   │   {   │   }   │   |   │   "   │   '   │
+│   '   │   "   │   `   │   ~   │   \   │   │   !   │   (   │   =   │   )   │   :   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   -   │   _   │   `   │   ~   │   +   │   │   :   │   ;   │   <   │   >   │   ·   │
+│   -   │   _   │   +   │   ^   │   ·   │   │   &   │   |   │   <   │   >   │   *   │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
                 │   ·   │   ·   │  ▓▓▓  │   │  ADJ  │   ·   │   ·   │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
-No common symbol needs `Symbols` + `Shift` + another key.
+No common symbol needs `Symbols` + `Shift` + another key. `/` `;` `,` `.` are absent
+because they are already on the base layer — `//` and `*/` need no Sym slot at all,
+you simply stop holding the thumb.
 
-| Sequence | Keys | Hand |
+| Sequence | Keys | Fingers |
 | --- | --- | --- |
-| `()` | `Sym` + `A` `S` | left |
-| `[]` | `Sym` + `D` `F` | left |
-| `{}` | `Sym` + `H` `J` | right |
-| `&&` | `Sym` + `U` `U` | right |
-| `\|\|` | `Sym` + `K` `K` | right |
-| `!` | `Sym` + `Q` | left |
-| `!=` | `Sym` + `Q` `G` | left |
-| `===` | `Sym` + `G` `G` `G` | left |
-| `=>` | `Sym` + `G` `.` | both |
-| `->` | `Sym` + `Z` `.` | both |
-| `++` | `Sym` + `B` `B` | left |
-| `--` | `Sym` + `Z` `Z` | left |
-| `__` | `Sym` + `X` `X` | left |
-| `??` | `Sym` + `O` `O` | right |
-| `::` | `Sym` + `N` `N` | right |
+| `()` | `Sym` + `J` `L` | index → ring |
+| `[]` | `Sym` + `U` `I` | index → middle |
+| `{}` | `Sym` + `O` `P` | ring → pinky |
+| `<>` | `Sym` + `,` `.` | middle → ring |
+| `=>` | `Sym` + `K` `.` | middle → ring |
+| `>=` | `Sym` + `.` `K` | ring → middle |
+| `!=` | `Sym` + `H` `K` | index → middle |
+| `==` | `Sym` + `K` `K` | middle ×2 |
+| `===` | `Sym` + `K` `K` `K` | middle ×3 |
+| `&&` | `Sym` + `N` `N` | index ×2 |
+| `\|\|` | `Sym` + `M` `M` | index ×2 |
+| `??` | `Sym` + `Y` `Y` | index ×2 |
+| `::` | `Sym` + `;` `;` | pinky ×2 |
+| `->` | `Sym` + `Z` `.` | **cross-hand** |
+| `+=` | `Sym` + `C` `K` | **cross-hand** |
+| `--` | `Sym` + `Z` `Z` | left pinky ×2 |
+| `__` | `Sym` + `X` `X` | left ring ×2 |
+
+`@ # $ %` stay on the `W E R T` columns, where `2 3 4 5` sit on a number row, so that
+much of the old mnemonic survives. `!` moved right because it is chained (`!=`,
+`!==`), which is the whole premise of the split.
+
+**Two known rough edges.** `<=` puts `<` and `=` on the same finger (middle) — the one
+common chain that would not place cleanly without displacing `=>`, which is more
+frequent. And `::` sits on the pinky, which is fine for JS/TS and annoying for Rust or
+C++.
 
 ---
 
