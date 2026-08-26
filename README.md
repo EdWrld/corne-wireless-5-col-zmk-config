@@ -14,14 +14,14 @@ two keys away.
 
 ## Layer 0 — Base
 
-Plain US QWERTY. No letter key has any hold behaviour — every modifier and every
-layer lives on a thumb. There is no `Alt` and no `GUI` on this layer at all.
+Plain US QWERTY, with one letter-key mod: **`A` held is `Alt`**. Every other modifier
+and every layer lives on a thumb. There is no `GUI` anywhere.
 
 ```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │   Q   │   W   │   E   │   R   │   T   │   │   Y   │   U   │   I   │   O   │   P   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   A   │   S   │   D   │   F   │   G   │   │   H   │   J   │   K   │   L   │   ;   │
+│  A/⎇  │   S   │   D   │   F   │   G   │   │   H   │   J   │   K   │   L   │   ;   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │   Z   │   X   │   C   │   V   │   B   │   │   N   │   M   │   ,   │   .   │   /   │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
@@ -48,6 +48,9 @@ all, so neither has a tapping term that could misfire.
 | Right inner | — | Layer 1 — Nav |
 | Right middle | `Space` | — |
 | Right outer | `Backspace` | — |
+
+`A/⎇` is the only letter-key mod — tap for `a`, hold for `Alt`. It exists because
+nothing else on the board produces `Alt`. See **Letter-key mods** below.
 
 **Combo:** `J` + `K` pressed together → `Esc`. Base layer only, 50 ms window.
 
@@ -197,6 +200,7 @@ Two behaviours, deliberately tuned differently:
 | --- | --- | --- | --- | --- |
 | `lt_fast` | Enter/Sym | `hold-preferred` | 200 ms | 175 ms |
 | `mt_slow` | Esc/Ctrl | `tap-preferred` | 220 ms | 175 ms |
+| `hm` | A/Alt | `balanced` | 200 ms | 175 ms |
 
 Only two thumbs are hold-taps at all now. `Sym` uses `hold-preferred` so the layer
 engages the instant another key is pressed — no waiting on the tapping term mid-word.
@@ -211,6 +215,26 @@ adjacent keys. `Ctrl+Shift+Nav+H/L` (select by word) needs a thumb roll. If it b
 add a combo rather than moving to home-row mods.
 
 **Tab** no longer has a base-layer key. It lives on `Nav` + left outer thumb.
+
+---
+
+## Letter-key mods
+
+`A` held is `Alt` — the only letter key on the board with a hold. It exists because
+`Alt` has no other home; `Ctrl` and `Shift` both have thumbs, so they stay there.
+
+It uses the `hm` behaviour, whose important setting is `require-prior-idle-ms = 150`:
+if any key was pressed within the last 150 ms the hold is **disabled entirely**, so
+mid-word rolls like `as`, `ar` or `ap` always resolve as a plain `a`. The mod only
+arms when you come to the key from rest, which is what you actually do when reaching
+for a shortcut.
+
+The one dead combination is `Alt+A`, since a key cannot be its own modifier. Nothing
+else on the board produces `Alt`, so there is no fallback for it.
+
+**`Alt+Tab` is awkward.** `Tab` has no base-layer key, so it is left pinky for `Alt`
+plus the `Nav` thumb plus the left outer thumb. If you use it often, a dedicated
+`&kp LA(TAB)` combo is the better answer.
 
 ---
 
