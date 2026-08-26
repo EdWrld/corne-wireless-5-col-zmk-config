@@ -30,11 +30,12 @@
             bindings = <&mo>, <&kp>;
         };
 
-        // Letter-key holds: Q -> Tab, A -> Ctrl, Z -> Shift, / -> Ctrl. The left three
-        // share the pinky column so no two of them combine; / is the right-hand Ctrl
-        // that covers those cases. require-prior-idle-ms is the key setting:
-        // if any key was pressed within 150 ms the hold is disabled outright, so
-        // mid-word rolls resolve as plain letters and never leak a modifier.
+        // Pinky-column holds, mirrored across the hands: A -> LCtrl, Z -> LShift,
+        // ; -> RCtrl, / -> RShift. Each pair shares a pinky column so no two on the
+        // same hand can combine; the opposite hand covers those cases.
+        // require-prior-idle-ms is the key setting: if any key was pressed within
+        // 150 ms the hold is disabled outright, so mid-word rolls resolve as plain
+        // letters and never leak a modifier.
         hm: home_row_mod {
             compatible = "zmk,behavior-hold-tap";
             #binding-cells = <2>;
@@ -96,7 +97,7 @@
         };
     };
 
-    // Hold both layer thumbs (Space/Nav + Enter/Symbols) for the Adjust layer.
+    // Hold both layer thumbs (Tab/Sym on the left, Nav on the right) for Adjust.
     conditional_layers {
         compatible = "zmk,conditional-layers";
         nav_sym_to_adj {
@@ -110,29 +111,31 @@
 
         default_layer {
             // 5-column US QWERTY: the 10 columns under Q-P, including ; , . /
+            // Thumb rows read: upper = tap, lower = hold.
             // -----------------------------------------------------------------------------------------
-            // | Q/T | W   | E   | R   | T   |     |  Y  |  U  |  I  |  O  |  P  |   Q/T = Tab on hold
-            // | A/C | S   | D   | F   | G   |     |  H  |  J  |  K  |  L  |  ;  |   A/C = Ctrl on hold
-            // | Z/S | X   | C   | V   | B   |     |  N  |  M  |  ,  |  .  | /-C |   Z/S = Shift, /-C = Ctrl
-            //             | SFT | ESC | ENT |     |     |BSPC | SPC |
-            //             |     | ALT | SYM |     | NAV |     |     |
+            // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  |  O  |  P  |
+            // | A/C |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | ;/C |   A/C ;/C = Ctrl on hold
+            // | Z/S |  X  |  C  |  V  |  B  |     |  N  |  M  |  ,  |  .  | //S |   Z/S //S = Shift on hold
+            //             | SFT | TAB | ENT |     | SPC | NAV |BSPC |
+            //             |     | SYM | ALT |     |     |     |     |
             display-name = "Base";
             bindings = <
                 &kp Q        &kp W            &kp E             &kp R      &kp T          &kp Y      &kp U      &kp I      &kp O      &kp P
                 &hm LCTRL A      &kp S            &kp D             &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &hm RCTRL SEMI
                 &hm LSHFT Z      &kp X            &kp C             &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &hm RSHFT FSLH
-                               &kp LSHFT        &lt_fast SYM TAB  &lt_fast LALT RET            &kp SPACE  &mo NAV    &kp BSPC   
+                               &kp LSHFT        &lt_fast SYM TAB  &mt_slow LALT RET            &kp SPACE  &mo NAV    &kp BSPC   
             >;
         };
 
         nav_layer {
-            // Hold the right inner Navigation thumb.
+            // Hold the Nav thumb (right middle).
             // Left hand is the tmux / pane cluster, right hand is movement.
+            // Note: the left outer thumb is TAB here, so thumb Shift is NOT available.
             // -----------------------------------------------------------------------------------------
             // | 1  | 2  | 3  | 4  | 5  |     | 6   | 7   | 8   | 9  | 0   |
             // |^H  |^J  |^K  |^L  |PFX |     | <-  | v   | ^   | -> | F11 |
             // |W<- |W-> |SPL-|SPL||ZOOM|     |HOME |PGDN |PGUP |END | F12 |
-            //             |TAB |CTL |ADJ |     |    |    |DEL |
+            //             |TAB |ADJ | -  |     | -  |HELD|DEL |
             display-name = "Nav";
             bindings = <
                 &kp N1         &kp N2         &kp N3      &kp N4      &kp N5           &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
@@ -143,7 +146,7 @@
         };
 
         sym_layer {
-            // Hold the left inner Symbols thumb (Enter).
+            // Hold the Sym thumb (left middle, tap = Tab).
             // Right hand = symbols that appear in sequences, placed so that no common
             // pair lands on the same finger. Left hand = symbols typed alone.
             // - and _ stay left so that -> and += are cross-hand alternations.
@@ -151,7 +154,7 @@
             // |   | @ | # | $ | % |     | ? | [ | ] | { | } |
             // | ' | " | ` | ~ | \ |     | ! | ( | = | ) | : |
             // | - | _ | + | ^ |   |     | & | | | < | > | * |
-            //             |SFT |ALT |   |     |ADJ |    |    |
+            //             | -  |HELD| -  |     | -  |ADJ | -  |
             display-name = "Sym";
             bindings = <
                 &trans     &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp QMARK  &kp LBKT   &kp RBKT   &kp LBRC   &kp RBRC
@@ -162,12 +165,13 @@
         };
 
         adjust_layer {
-            // Hold Sym (left inner) + Nav (right inner). Radios, output, and the F-row.
+            // Hold Sym (left middle) + Nav (right middle). Radios, output, and the F-row.
+            // A- sits under the held Nav thumb, so only A= is reachable from here.
             // -----------------------------------------------------------------------------------------
             // |A1  |A2  |A3  |A4  |A5  |     |A6 |A7 |A8 |A9 |A0 |
             // |BT0 |BT1 |BT2 |BT3 |BT4 |     |F1 |F2 |F3 |F4 |F5 |
-            // |CLR |USB |BLE |RST |BOOT|     |F6 |F7 |F8 |F9 |F10|
-            //             |    |    |    |     |   |A- |A= |
+            // |CLR |USB |BLE |RST |BOOT|     |F6 |F7 |F8 |F9 |F12|
+            //             | -  |HELD| -  |     | - |A- |A= |
             display-name = "Adj";
             bindings = <
                 &kp RA(N1)    &kp RA(N2)    &kp RA(N3)    &kp RA(N4)   &kp RA(N5)     &kp RA(N6) &kp RA(N7)     &kp RA(N8)     &kp RA(N9) &kp RA(N0)
