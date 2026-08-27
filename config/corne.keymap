@@ -8,11 +8,47 @@
 #include <dt-bindings/zmk/keys.h>
 #include <dt-bindings/zmk/bt.h>
 #include <dt-bindings/zmk/outputs.h>
+#include <dt-bindings/zmk/pointing.h>
 
-#define BASE 0
-#define NAV  1
-#define SYM  2
-#define ADJ  3
+#define L0 0   // base
+#define L1 1   // nav / numpad
+#define L2 2   // symbols
+#define L3 3   // adjust
+#define L4 4   // mouse
+
+// LAYER ROTARY --------------------------------------------------------------
+// Base layer keys:
+//   pos 31  &lt L2 TAB     hold = dip into symbols, tap = Tab
+//   pos 34  &slt L1 L1     tap = sticky nav (one key, then gone), hold = lock nav on
+// The sticky tap is the tmux path: tap 34, hit the prefix macro, you are back on
+// base with no return trip. Holding 34 past 250ms locks the layer and starts the
+// rotary below; anything shorter, with or without another key pressed, is the tap.
+//
+// Every non-base layer carries Tab at the top-left key and Esc directly under it
+// (positions 0 and 10). Base keeps its letters there; Esc on base is the J+K combo.
+//
+// On every non-base layer, 31 and 34 are plain &to switches:
+//
+//        L0 --34--> L1 --34--> L2 --34--> L3 --34--> L4 --34--> L0
+//           <--31--    <--31--    <--31--    <--31--
+//
+//   34 = next layer      31 = previous layer      31+34 together = back to L0
+//
+// The 31+34 chord is a combo scoped to L1..L4, so it can never fire from base.
+// &sl holds its layer for release-after-ms (1000 by default) after a bare tap.
+
+// Built-in mod-tap: used on the thumbs. tap-preferred so a fast tap never
+// leaks a modifier.
+&mt {
+    flavor = "tap-preferred";
+    tapping-term-ms = <200>;
+};
+
+// Mouse-move acceleration curve. Inert unless CONFIG_ZMK_POINTING=y.
+&mmv {
+    time-to-max-speed-ms = <680>;
+    acceleration-exponent = <2>;
+};
 
 / {
     chosen {
@@ -20,52 +56,46 @@
     };
 
     behaviors {
-        // Layer thumbs: switch to the layer as soon as another key is pressed.
-        lt_fast: layer_tap_fast {
+        // Home-row holds on the middle and index fingers only, mirrored across the
+        // hands: D/K -> Alt, F/J -> GUI. The pinkies stay plain letters and Ctrl /
+        // Shift live on the thumbs as sticky keys, which is what keeps this safe
+        // without require-prior-idle-ms. tap-preferred: a roll that completes
+        // inside the term resolves as the letter.
+        hm: homerow_mods {
             compatible = "zmk,behavior-hold-tap";
+            label = "HOMEROW_MODS";
             #binding-cells = <2>;
-            flavor = "hold-preferred";
             tapping-term-ms = <200>;
-            quick-tap-ms = <175>;
-            bindings = <&mo>, <&kp>;
-        };
-
-        // Pinky-column holds, mirrored across the hands: A -> LCtrl, Z -> LShift,
-        // ; -> RCtrl, / -> RShift. Each pair shares a pinky column so no two on the
-        // same hand can combine; the opposite hand covers those cases.
-        // require-prior-idle-ms is the key setting: if any key was pressed within
-        // 150 ms the hold is disabled outright, so mid-word rolls resolve as plain
-        // letters and never leak a modifier.
-        hm: home_row_mod {
-            compatible = "zmk,behavior-hold-tap";
-            #binding-cells = <2>;
-            flavor = "balanced";
-            tapping-term-ms = <200>;
-            quick-tap-ms = <175>;
-            require-prior-idle-ms = <150>;
+            quick-tap-ms = <0>;
+            flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
         };
 
-        // Modifier thumbs: conservative, so a fast tap never leaks a modifier.
-        mt_slow: mod_tap_slow {
+        // Tap = sticky layer: you land on the layer and it drops itself after the
+        // next keycode, so a tmux prefix macro is one tap plus one key with no
+        // return trip. Hold past the term = &tog, which locks the layer on until
+        // you leave it deliberately. tap-preferred means the hold only resolves
+        // when the term fully expires, so a quick press can never leak a toggle.
+        // Press another key before releasing and it still resolves as the tap,
+        // and &sl drops the layer the moment you let go - that is the momentary case.
+        slt: sticky_layer_toggle {
             compatible = "zmk,behavior-hold-tap";
+            label = "STICKY_LAYER_TOGGLE";
             #binding-cells = <2>;
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
             flavor = "tap-preferred";
-            tapping-term-ms = <220>;
-            quick-tap-ms = <175>;
-            bindings = <&kp>, <&kp>;
+            bindings = <&tog>, <&sl>;
         };
 
-        // Top-row holds: Q..P -> 1..0. tap-preferred so any roll during the term
-        // resolves as the letter, and require-prior-idle-ms disables the hold
-        // outright within 150 ms of another key, so mid-word holds never digit.
-        nt: number_tap {
+        // Short-term two-key: tap one keycode, hold for the other.
+        td: tapdance {
             compatible = "zmk,behavior-hold-tap";
+            label = "TAPDANCE";
             #binding-cells = <2>;
+            tapping-term-ms = <150>;
+            quick-tap-ms = <0>;
             flavor = "tap-preferred";
-            tapping-term-ms = <200>;
-            quick-tap-ms = <175>;
-            require-prior-idle-ms = <150>;
             bindings = <&kp>, <&kp>;
         };
     };
@@ -105,96 +135,129 @@
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
             key-positions = <16 17>;
-            layers = <BASE>;
+            layers = <L0>;
             bindings = <&kp ESC>;
         };
-    };
 
-    // Hold both layer thumbs (Tab/Sym on the left, Nav on the right) for Adjust.
-    conditional_layers {
-        compatible = "zmk,conditional-layers";
-        nav_sym_to_adj {
-            if-layers = <NAV SYM>;
-            then-layer = <ADJ>;
+        // Both thumb layer keys at once -> straight back to base, from any
+        // layer. Scoped off L0 so the base hold-to-dip keys are untouched:
+        // ZMK picks combo candidates from the highest active layer at the
+        // FIRST keypress, so pressing 31 then 34 from base can never match.
+        combo_to_base {
+            timeout-ms = <50>;
+            key-positions = <31 34>;
+            layers = <L1 L2 L3 L4>;
+            bindings = <&to L0>;
         };
     };
 
     keymap {
         compatible = "zmk,keymap";
-        default_layer {
+        layer_0 {
             // 5-column US QWERTY: the 10 columns under Q-P, including ; , . /
             // Thumb rows read: upper = tap, lower = hold.
             // -----------------------------------------------------------------------------------------
-            // | Q/1 | W/2 | E/3 | R/4 | T/5 |     | Y/6 | U/7 | I/8 | O/9 | P/0 |   Q/1 .. P/0 = digit on hold
-            // | A/C |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | ;/C |   A/C ;/C = Ctrl on hold
-            // | Z/S |  X  |  C  |  V  |  B  |     |  N  |  M  |  ,  |  .  | //S |   Z/S //S = Shift on hold
-            //             | SFT | TAB | ENT |     | SPC | NAV |BSPC |
-            //             |     | SYM | ALT |     |     |     |     |
-            display-name = "Base";
+            // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |   O held = -
+            // |  A  |  S  | D/A | F/G |  G  |     |  H  | J/G | K/A |  L  |  ;  |   D/A K/A = Alt, F/G J/G = GUI on hold
+            // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  |  ,  | ./! |  /  |   . held = !
+            //             |STICKY| TAB |STICKY|   | SPC | L1  | DEL |   L1: tap = sticky, hold = lock on
+            //             | CTRL | L2  | SHFT |   |     |     |     |   L2: tap = TAB, hold = dip
+            display-name = "L0";
             bindings = <
-                &nt N1 Q     &nt N2 W         &nt N3 E          &nt N4 R   &nt N5 T       &nt N6 Y   &nt N7 U   &nt N8 I   &nt N9 O   &nt N0 P
-                &hm LCTRL A      &kp S            &kp D             &kp F      &kp G          &kp H      &kp J      &kp K      &kp L      &hm RCTRL SEMI
-                &hm LSHFT Z      &kp X            &kp C             &kp V      &kp B          &kp N      &kp M      &kp COMMA  &kp DOT    &hm RSHFT FSLH
-                               &kp LSHFT        &lt_fast SYM TAB  &mt_slow LALT RET            &kp SPACE  &mo NAV    &kp BSPC   
+                &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
+                &kp A      &kp S      &hm LALT D  &hm LGUI F   &kp G        &kp H      &hm RGUI J  &hm RALT K  &kp L      &kp SEMI
+                &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &kp COMMA   &td EXCL DOT  &kp FSLH
+                                      &sk LCTRL   &lt L2 TAB  &sk LSHIFT    &kp SPACE  &slt L1 L1  &kp DEL
             >;
         };
 
-        nav_layer {
-            // Hold the Nav thumb (right middle).
-            // Left hand is the tmux / pane cluster, right hand is movement.
-            // Note: the left outer thumb is TAB here, so thumb Shift is NOT available.
+        layer_1 {
+            // Toggle on with the right inner thumb.
+            // Left hand is tmux / window / arrows, right hand is a numpad cluster.
+            // Note: the left outer thumb is TAB here, so thumb Ctrl is NOT available.
             // -----------------------------------------------------------------------------------------
-            // | 1  | 2  | 3  | 4  | 5  |     | 6   | 7   | 8   | 9  | 0   |
-            // |^H  |^J  |^K  |^L  |PFX |     | <-  | v   | ^   | -> | F11 |
-            // |W<- |W-> |SPL-|SPL||ZOOM|     |HOME |PGDN |PGUP |END | F12 |
-            //             |TAB |ADJ | -  |     | -  |HELD|DEL |
-            display-name = "Nav";
+            // HOME/END sit above each other in the inner column, and land directly
+            // across the split gap from PG_UP/PG_DN - the same 2x2 block a full
+            // keyboard's nav cluster has. The bare tmux prefix moves down to join
+            // the other two tmux keys.
+            // |TAB |^H  |^J  |^K  |^L  |     |PGUP| 7 | 8 | 9 |BSPC|
+            // |ESC | <- | v  | ^  | -> |     |PGDN| 4 | 5 | 6 |RET |
+            // |SPL-|SPL||PFX |HOME|END |     | 0  | 1 | 2 | 3 | .  |
+            //             |W<- | L0 | -  |     | -  | L2 |W-> |
+            //             |TAB | L0 | -  |     | -  | L2 | -  |   31 = back to base, 34 = on to L2
+            display-name = "L1";
             bindings = <
-                &kp N1         &kp N2         &kp N3      &kp N4      &kp N5           &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
-                &kp LC(H)      &kp LC(J)      &kp LC(K)   &kp LC(L)   &kp LC(SPACE)    &kp LEFT   &kp DOWN   &kp UP     &kp RIGHT  &kp F11
-                &kp LA(LS(H))  &kp LA(LS(L))  &tmux_below &tmux_right &tmux_zoom       &kp HOME   &kp PG_DN  &kp PG_UP  &kp END    &kp F12
-                                              &kp TAB     &trans      &trans           &trans     &trans     &kp DEL
+                &kp TAB        &kp LC(H)      &kp LC(J)     &kp LC(K)  &kp LC(L)     &kp PG_UP  &kp N7     &kp N8     &kp N9     &kp BSPC
+                &kp ESC        &kp LEFT       &kp DOWN      &kp UP     &kp RIGHT     &kp PG_DN  &kp N4     &kp N5     &kp N6     &kp RET
+                &tmux_below    &tmux_right    &kp LC(SPACE) &kp HOME   &kp END       &kp N0     &kp N1     &kp N2     &kp N3     &kp DOT
+                                              &kp LA(LS(H)) &to L0     &trans        &trans     &to L2     &kp LA(LS(L))
             >;
         };
 
-        sym_layer {
-            // Hold the Sym thumb (left middle, tap = Tab).
-            // Right hand = symbols that appear in sequences, placed so that no common
-            // pair lands on the same finger. Left hand = symbols typed alone.
-            // - and _ stay left so that -> and += are cross-hand alternations.
+        layer_2 {
+            // Hold the left inner thumb (tap = Tab).
+            // Shifted symbols are NOT bound here. Only the unshifted source key is,
+            // exactly as on a full keyboard, and Shift produces the pair:
+            //     Shift + [ ] -> { }      Shift + \ -> |      Shift + ` -> ~
+            //     Shift + '   -> "        Shift + - -> _      Shift + = -> +
+            // Blank cells are &trans and fall through to the base letter, so the
+            // bottom right still reads , . / and Shift gives < > ? the same way.
+            // Tap the sticky Shift BEFORE holding this layer - both are left thumb
+            // keys, and a sticky mod survives a layer hold (it only releases on the
+            // next keycode).
+            // ! @ # $ % ^ & * ( ) stay direct: their source digits live on L1 in
+            // numpad order, so Shift+digit there would not match a real number row.
             // -----------------------------------------------------------------------------------------
-            // |   | @ | # | $ | % |     | ? | [ | ] | { | } |
-            // | ' | " | ` | ~ | \ |     | ! | ( | = | ) | : |
-            // | - | _ | + | ^ |   |     | & | | | < | > | * |
-            //             | -  |HELD| -  |     | -  |ADJ | -  |
-            display-name = "Sym";
+            // |TAB| @ | # | $ | % |     | [ | ] |   |   |BSPC|
+            // |ESC| ' | ` |   | \ |     | ! | ( | = | ) |RET |
+            // | - |   |   | ^ |   |     | & | * | , | . | / |
+            //             | -  | L1 | -  |     | -  | L3 | -  |   held from base: 31 is the held key,
+            //                                                       so tap 34 to lock into Adjust.
+            display-name = "L2";
             bindings = <
-                &trans     &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp QMARK  &kp LBKT   &kp RBKT   &kp LBRC   &kp RBRC
-                &kp SQT    &kp DQT    &kp GRAVE  &kp TILDE  &kp BSLH      &kp EXCL   &kp LPAR   &kp EQUAL  &kp RPAR   &kp COLON
-                &kp MINUS  &kp UNDER  &kp PLUS   &kp CARET  &trans        &kp AMPS   &kp PIPE   &kp LT     &kp GT     &kp STAR
-                                      &trans     &trans     &trans        &trans     &trans     &trans
+                &kp TAB    &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp LBKT   &kp RBKT   &trans     &trans     &kp BSPC
+                &kp ESC    &kp SQT    &kp GRAVE  &trans     &kp BSLH      &kp EXCL   &kp LPAR   &kp EQUAL  &kp RPAR   &kp RET
+                &kp MINUS  &trans     &trans     &kp CARET  &trans        &kp AMPS   &kp STAR   &trans     &trans     &trans
+                                      &trans     &to L1     &trans        &trans     &to L3     &trans
             >;
         };
 
-        adjust_layer {
-            // Hold Sym (left middle) + Nav (right middle). Radios, output, and the F-row.
-            // A- sits under the held Nav thumb, so only A= is reachable from here.
+        layer_3 {
+            // Reached by advancing twice from base (34, 34, 34) or by tapping 34
+            // while holding the L2 thumb. Radios, output, and the F-row.
             // -----------------------------------------------------------------------------------------
-            // |A1  |A2  |A3  |A4  |A5  |     |A6 |A7 |A8 |A9 |A0 |
-            // |BT0 |BT1 |BT2 |BT3 |BT4 |     |F1 |F2 |F3 |F4 |F5 |
-            // |CLR |USB |BLE |RST |BOOT|     |F6 |F7 |F8 |F9 |F12|
-            //             | -  |HELD| -  |     | - |A- |A= |
-            display-name = "Adj";
+            // Tab/Esc claim two keys, so BT4 and A5 - the last member of each group -
+            // move to the two thumb slots that were falling through to Shift/Space.
+            // |TAB |A1  |A2  |A3  |A4  |     |F1 |F2 |F3 |F4 |BSPC|
+            // |ESC |BT0 |BT1 |BT2 |BT3 |     |F5 |F6 |F7 |F8 |RET |
+            // |CLR |USB |BLE |RST |BOOT|     |F9 |F10|F11|F12| -  |
+            //             |A-  | L2 |BT4 |     |A5 | L4 |A= |
+            display-name = "L3";
             bindings = <
-                &kp RA(N1)    &kp RA(N2)    &kp RA(N3)    &kp RA(N4)   &kp RA(N5)     &kp RA(N6) &kp RA(N7)     &kp RA(N8)     &kp RA(N9) &kp RA(N0)
-                &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3 &bt BT_SEL 4   &kp F1     &kp F2         &kp F3         &kp F4     &kp F5
-                &bt BT_CLR    &out OUT_USB  &out OUT_BLE  &sys_reset   &bootloader    &kp F6     &kp F7         &kp F8         &kp F9     &kp F12
-                                            &trans        &trans       &trans         &trans     &kp RA(MINUS)  &kp RA(EQUAL)
+                &kp TAB       &kp RA(N1)    &kp RA(N2)    &kp RA(N3)    &kp RA(N4)    &kp F1     &kp F2         &kp F3         &kp F4     &kp BSPC
+                &kp ESC       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &kp F5     &kp F6         &kp F7         &kp F8     &kp RET
+                &bt BT_CLR    &out OUT_USB  &out OUT_BLE  &sys_reset    &bootloader   &kp F9     &kp F10        &kp F11        &kp F12    &trans
+                                            &kp RA(MINUS) &to L2        &bt BT_SEL 4  &kp RA(N5) &to L4         &kp RA(EQUAL)
             >;
         };
 
-        extra_1 {
-            status = "reserved";
+        layer_4 {
+            // Last stop on the rotary: 34 wraps around to base, 31 steps back to Adjust.
+            // The left outer thumb is also a hard &to L0, since the left hand is busy moving.
+            // Left hand moves and scrolls, right home row clicks. Every &trans still types
+            // its base letter, so you can keep typing with the layer on.
+            // -----------------------------------------------------------------------------------------
+            // |TAB |SCR<|MV^ |SCR>| -  |     | - | -  | -  | -  |BSPC|
+            // |ESC |MV< |MVv |MV> | -  |     | - |LCLK|MCLK|RCLK|RET |
+            // | -  |SCRv|SCR^| -  | -  |     | - | -  | -  | -  | - |
+            //             | L0 | L3 | -  |     | - | L0 | -  |
+            display-name = "L4";
+            bindings = <
+                &kp TAB &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &trans     &trans  &trans     &trans     &trans     &kp BSPC
+                &kp ESC &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &trans     &trans  &mkp LCLK  &mkp MCLK  &mkp RCLK  &kp RET
+                &trans  &msc SCRL_DOWN  &msc SCRL_UP    &trans           &trans     &trans  &trans     &trans     &trans     &trans
+                                        &to L0          &to L3           &trans     &trans  &to L0     &trans
+            >;
         };
 
         extra_2 {
