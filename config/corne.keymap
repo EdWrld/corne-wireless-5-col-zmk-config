@@ -17,12 +17,17 @@
 #define L4 4   // mouse
 
 // LAYER ROTARY --------------------------------------------------------------
-// Base layer keys:
-//   pos 31  &lt L2 TAB     hold = dip into symbols, tap = Tab
-//   pos 34  &slt L1 L1     tap = sticky nav (one key, then gone), hold = lock nav on
-// The sticky tap is the tmux path: tap 34, hit the prefix macro, you are back on
-// base with no return trip. Holding 34 past 250ms locks the layer and starts the
+// Base layer keys - left hand owns nav, right hand owns symbols, and both are
+// held by the OPPOSITE thumb from the hand that does the work:
+//   pos 31  &slt L1 L1     tap = sticky nav (one key, then gone), hold = lock nav on
+//   pos 34  &lt L2 TAB     hold = dip into symbols, tap = Tab
+// L1's numpad lives on the right hand, so the left thumb holds it; L2's brackets
+// and parens live on the right hand too, so the right thumb only ever dips into it.
+// The sticky tap is the tmux path: tap 31, hit the prefix macro, you are back on
+// base with no return trip. Holding 31 past 250ms locks the layer and starts the
 // rotary below; anything shorter, with or without another key pressed, is the tap.
+// The left key is self-inverting: it enters L1 from base, and on L1 it is the
+// &to L0 that leaves. Left is always "out", right is always "deeper".
 //
 // Every non-base layer carries Tab at the top-left key and Esc directly under it
 // (positions 0 and 10). Base keeps its letters there; Esc on base is the J+K combo.
@@ -160,14 +165,14 @@
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |   O held = -
             // |  A  |  S  | D/A | F/G |  G  |     |  H  | J/G | K/A |  L  |  ;  |   D/A K/A = Alt, F/G J/G = GUI on hold
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  |  ,  | ./! |  /  |   . held = !
-            //             |STICKY| TAB |STICKY|   | SPC | L1  | DEL |   L1: tap = sticky, hold = lock on
-            //             | CTRL | L2  | SHFT |   |     |     |     |   L2: tap = TAB, hold = dip
+            //             |STICKY| L1  |STICKY|   | SPC | TAB | DEL |   L1: tap = sticky, hold = lock on
+            //             | CTRL |     | SHFT |   |     | L2  |     |   L2: tap = TAB, hold = dip
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
                 &kp A      &kp S      &hm LALT D  &hm LGUI F   &kp G        &kp H      &hm RGUI J  &hm RALT K  &kp L      &kp SEMI
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &kp COMMA   &td EXCL DOT  &kp FSLH
-                                      &sk LCTRL   &lt L2 TAB  &sk LSHIFT    &kp SPACE  &slt L1 L1  &kp DEL
+                                      &sk LCTRL   &slt L1 L1  &sk LSHIFT    &kp SPACE  &lt L2 TAB  &kp DEL
             >;
         };
 
