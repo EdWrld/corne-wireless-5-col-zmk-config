@@ -139,7 +139,7 @@
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
-                &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L      &td SEMI SQT
+                &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L        &kp SQT
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &kp FSLH
                                       &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp BSPC
             >;
@@ -157,7 +157,7 @@
             display-name = "L1";
             bindings = <
                 &kp TAB    &kp AT     &kp HASH   &kp PRCNT  &kp DLLR      &kp N0     &kp LBRC   &kp RBRC   &kp AMPS   &kp BSPC
-                &kp ESC    &kp DQT   &kp STAR   &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp SEMI  &kp RET
+                &kp ESC    &kp DQT   &kp STAR   &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp COLON   &kp SEMI
                 &kp MINUS  &kp EXCL   &kp GRAVE  &kp BSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp FSLH
                                       &trans     &to L0     &trans        &sk RALT   &to L2     &trans
             >;
