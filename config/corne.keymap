@@ -17,11 +17,15 @@
 #define L4 4   // adjust
 
 // Thumb positions 31 (left) and 34 (right) drive every layer change.
-//   base    31 = &slt L1, 34 = &slt L2   tap = sticky one key, hold 250ms = lock on
+//   base    31 = &slm L1   tap = sticky one key, hold = momentary while held
+//           34 = &slt L2   tap = sticky one key, hold 250ms = lock on
 //   L1-L4   31 = step out, 34 = step in, 31+34 = back to base
 //
-//     L0 --34--> L1 --34--> L2 --34--> L3 --34--> L4 --34--> L0
-//        <--31--    <--31--    <--31--    <--31--
+//     L0 --34--> L1 --34--> L2 --34--> L3 ..hold 34..> L4
+//        <--31--    <--31--    <--31--
+//
+// L4 is the exception: hold, never tap, so the radios and bootloader cannot be
+// reached by tapping the step-in thumb one time too many.
 //
 // Tab and Esc are at positions 0 and 10 on every non-base layer.
 
@@ -52,6 +56,20 @@
             quick-tap-ms = <0>;
             flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
+        };
+
+        // tap = &sl (layer drops after the next keycode), hold = &mo (live while held).
+        // hold-preferred so the layer is live the instant another key goes down -
+        // no 250 ms dead spot before the first symbol. Safe here because both
+        // branches emit the same character; only the exit differs.
+        slm: sticky_layer_momentary {
+            compatible = "zmk,behavior-hold-tap";
+            label = "STICKY_LAYER_MOMENTARY";
+            #binding-cells = <2>;
+            tapping-term-ms = <250>;
+            quick-tap-ms = <0>;
+            flavor = "hold-preferred";
+            bindings = <&mo>, <&sl>;
         };
 
         // tap = &sl (layer drops after the next keycode), hold 250ms = &tog (locks on).
@@ -116,29 +134,32 @@
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  |  ;  |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! |  /  |
-            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |
+            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |   L1: tap = one key, hold = momentary
+            //                                                            L2: tap = one key, hold = lock on
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
                 &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L      &kp SEMI
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &kp FSLH
-                                      &sk LCTRL   &slt L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp BSPC
+                                      &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp BSPC
             >;
         };
 
         layer_1 {
-            // Every symbol is direct; no Shift needed. All four brackets sit on one row.
+            // Every symbol is direct; no Shift needed.
             // ~ and + are not bound: they are Shift + the ` and = on this layer.
-            // |TAB| @ | # | % | $ |     | 0 | < | > | & |BSPC|
+            // All three bracket pairs share two columns - openers on the index,
+            // closers on the middle - so only the row changes between them.
+            // |TAB| @ | # | % | $ |     | 0 | { | } | & |BSPC|
             // |ESC| ! | ` | | | ? |     | = | ( | ) | ' |RET |
-            // | - | " | * | \ | _ |     | [ | { | } | ] | / |
+            // | - | " | * | \ | _ |     | < | [ | ] | > | / |
             //             | -  | L0 | -  |     |sALT| L2 | -  |
             display-name = "L1";
             bindings = <
-                &kp TAB    &kp AT     &kp HASH   &kp PRCNT  &kp DLLR      &kp N0     &kp LT     &kp GT     &kp AMPS   &kp BSPC
-                &kp ESC    &kp EXCL   &kp GRAVE  &kp PIPE   &kp QMARK     &kp EQUAL  &kp LPAR   &kp RPAR   &kp SQT    &kp RET
-                &kp MINUS  &kp DQT    &kp STAR   &kp BSLH   &kp UNDER     &kp LBKT   &kp LBRC   &kp RBRC   &kp RBKT   &kp FSLH
-                                      &trans     &to L0     &trans        &sk RALT   &to L2     &trans
+                &kp TAB    &kp AT     &kp HASH   &kp PRCNT  &kp DLLR      &kp N0     &kp LBRC   &kp RBRC   &kp AMPS   &kp BSPC
+                &kp ESC    &kp EXCL   &kp GRAVE  &kp QMARK  &kp PIPE      &kp SQT    &kp LPAR   &kp RPAR   &kp EQUAL  &kp RET
+                &kp MINUS  &kp DQT    &kp STAR   &kp BSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp FSLH
+                                      &trans     &to L0     &kp LGUI      &sk RALT   &to L2     &trans
             >;
         };
 
@@ -165,17 +186,20 @@
             // |TAB |SCR<|MV^ |SCR>|    |     |BACK|C-S-TAB|C-TAB|FWD |BSPC|
             // |ESC |MV< |MVv |MV> |DEL |     | <- |   v   |  ^  | -> |RET |
             // |    |RCLK|SCR^|SCRv|    |     |HOME| PGDN  |PGUP |END |TABS|
-            //             | L0 | L2 |LCLK|     |sALT| L4 | -  |
+            //             | L0 | L2 |LCLK|     |sALT| L4 | -  |   L4 is HOLD only, not a tap
             display-name = "L3";
             bindings = <
                 &kp TAB  &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &trans     &kp LA(LEFT)  &kp LC(LS(TAB))  &kp LC(TAB)  &kp LA(RIGHT)  &kp BSPC
                 &kp ESC  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &kp DEL    &kp LEFT      &kp DOWN         &kp UP       &kp RIGHT      &kp RET
                 &trans   &mkp RCLK       &msc SCRL_UP    &msc SCRL_DOWN   &trans     &kp HOME      &kp PG_DN        &kp PG_UP    &kp END        &kp LC(LS(A))
-                                         &to L0          &to L2           &mkp LCLK  &sk RALT   &to L4           &trans
+                                         &to L0          &to L2           &mkp LCLK  &sk RALT   &mo L4           &trans
             >;
         };
 
         layer_4 {
+            // Reached only by HOLDING position 34 on L3 - a tap does nothing. That
+            // keeps sys_reset, bootloader and the radios off the tap-to-step-in ring,
+            // so walking the thumb can never land you here.
             // Blank cells fall through to base.
             // |TAB |    |    |    |BT4 |     |F1 |F2 |F3 |F4 |BSPC|
             // |ESC |BT0 |BT1 |BT2 |BT3 |     |F5 |F6 |F7 |F8 |RET |

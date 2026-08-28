@@ -15,26 +15,35 @@ built around Vim and tmux.
 ## How the layers work
 
 Two thumb keys drive every layer change: **position 31** (left, under the index)
-and **position 34** (right). On base they are `&slt`, a hold-tap whose tap is a
-sticky layer and whose hold is a toggle:
+and **position 34** (right). Both are hold-taps whose tap is a sticky layer, but
+they differ on the hold, because symbols and numbers are typed differently:
 
-| Gesture | Result |
-| --- | --- |
-| tap | that layer for **exactly one key**, then back to base |
-| hold past 250 ms | that layer **locked on**, and it stays after you release |
-| both thumbs together | back to base, from any layer |
+| Gesture | Left thumb (L1, symbols) | Right thumb (L2, numbers) |
+| --- | --- | --- |
+| tap | that layer for **exactly one key** | same |
+| hold | **momentary** — live while held, gone on release | past 250 ms, **locked on** and stays |
+| both thumbs together | back to base, from any layer | same |
+
+Symbols arrive in runs — `()`, `->`, `{}`, `=>` — so holding is the natural
+gesture and locking has little to do. Numbers are the opposite: one long digit
+string, which is exactly what a lock is for.
 
 On every non-base layer those same two positions become plain `&to` switches —
 **31 steps out, 34 steps in** — so the layers form a ring:
 
 ```
-    L0 --34--> L1 --34--> L2 --34--> L3 --34--> L4 --34--> L0
-       <--31--    <--31--    <--31--    <--31--
+    L0 --34--> L1 --34--> L2 --34--> L3 ··hold 34··> L4
+       <--31--    <--31--    <--31--
 ```
 
-There is deliberately **no momentary layer**: `&slt` binds `&tog` and `&sl`, with
-no `&mo` anywhere. A tap gives one key; anything longer locks. Typing a run of
-symbols means lock, type, then both thumbs to leave.
+**L4 is the exception: hold, never tap.** Tapping the step-in thumb one time too
+many used to land you on the adjust layer with `sys_reset`, `bootloader` and the
+Bluetooth profiles under your fingers. Position 34 on L3 is `&mo L4`, so a tap
+does nothing at all and reaching the radios takes a deliberate hold plus a
+second key on the other hand.
+
+L1 cannot be locked from its own key. To lock it, hold the right thumb past
+250 ms to lock L2, then tap position 31 — which is `&to L1` there.
 
 `Tab` and `Esc` sit at positions 0 and 10 on every non-base layer, so they are in
 the same place no matter where you are.
@@ -55,7 +64,7 @@ as sticky keys, which can also be held like ordinary modifiers.
 │   Z   │   X   │   C   │   V   │   B   │   │   N   │   M   │  ,/_  │  ./!  │   /   │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │ sCtrl │   L1  │   s⇧  │   │   ␣   │   L2  │   ⌫   │
+                │ sCtrl │&slm L1 L1│   s⇧  │   │   ␣   │   L2  │   ⌫   │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 
 `s` prefixes a sticky modifier. `x/y` is a tapdance — tap `x`, hold for `y`:
@@ -69,19 +78,22 @@ combos. `Delete` exists only on L3.
 
 ## L1 — Symbols
 
-Every symbol is a direct keypress; nothing here needs `Shift`. All four brackets
-sit together on the bottom row, and `0` and `$` give the Vim line-start and
-line-end motions on one layer.
+Every symbol is a direct keypress; nothing here needs `Shift`. `0` and `$` give
+the Vim line-start and line-end motions on one layer.
+
+All three bracket pairs share the same two columns — **openers on the index
+finger, closers on the middle** — so the finger pair never changes and only the
+row does: `{}` on top, `()` on home, `[]` below.
 
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
-│   ⇥   │   @   │   #   │   %   │   $   │   │   0   │   <   │   >   │   &   │   ⌫   │
+│   ⇥   │   @   │   #   │   %   │   $   │   │   0   │   {   │   }   │   &   │   ⌫   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │  Esc  │   !   │   `   │   |   │   ?   │   │   =   │   (   │   )   │   '   │   ⏎   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   -   │   "   │   *   │   \   │   _   │   │   [   │   {   │   }   │   ]   │   /   │
+│   -   │   "   │   *   │   \   │   _   │   │   <   │   [   │   ]   │   >   │   /   │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │   ·   │   L0  │   ·   │   │ sAltGr│   L2  │   ·   │
+                │   ·   │   L0  │ Super │   │ sAltGr│   L2  │   ·   │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 
 `~` and `+` are the two omissions — they are `Shift` + the `` ` `` and `=` on
@@ -154,8 +166,8 @@ but works over USB.
 
 ## L4 — Adjust
 
-Radios, output routing, reset and the F-row. Four steps around the ring from
-base, which is where the once-a-month keys belong.
+Radios, output routing, reset and the F-row. Reached only by **holding**
+position 34 while on L3 — never by tapping — so it cannot be stumbled into.
 
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │   ⇥   │   ·   │   ·   │   ·   │  BT4  │   │   F1  │   F2  │   F3  │   F4  │   ⌫   │
@@ -194,15 +206,21 @@ for `:w<CR>` to work.
 
 | Behaviour | Used on | Flavor | Term | Notes |
 | --- | --- | --- | --- | --- |
-| `slt` | base thumbs 31 / 34 | `tap-preferred` | 250 ms | `&tog` on hold, `&sl` on tap |
+| `slm` | base thumb 31 (L1) | `hold-preferred` | 250 ms | `&mo` on hold, `&sl` on tap |
+| `slt` | base thumb 34 (L2) | `tap-preferred` | 250 ms | `&tog` on hold, `&sl` on tap |
 | `td` | `O`, `,`, `.` on base | `tap-preferred` | 200 ms | `&td <hold> <tap>` |
 | `hm` | *unused* | `tap-preferred` | 200 ms | kept so a home-row mod is one word away |
 | `&mt` | *unused* | `tap-preferred` | 200 ms | node override only |
 | `&mmv` | L3 pointer | — | — | 680 ms to max speed, acceleration exponent 2 |
 
 `tap-preferred` resolves the hold **only** when the term expires — another
-keypress cannot force it. That is what stops a fast tap from leaking a toggle,
-and it is also why a held layer is not live until 250 ms have passed.
+keypress cannot force it. That is what stops a fast tap from leaking a toggle
+on `slt`, and it is also why a locked layer is not live until 250 ms have passed.
+
+`slm` uses `hold-preferred` instead, so the symbol layer goes live the instant
+another key goes down — no dead spot before the first `(`. That flavor normally
+risks reading a fast tap-then-key as a hold, but here both branches emit the
+same character and only the exit differs, so the misread is invisible.
 
 ---
 
@@ -240,7 +258,7 @@ you want to keep them.
 | Index | Name | Contents | Reached by |
 | --- | --- | --- | --- |
 | 0 | L0 | QWERTY | default |
-| 1 | L1 | symbols | left thumb — tap for one key, hold to lock |
-| 2 | L2 | numbers, media, clipboard | right thumb — tap for one key, hold to lock |
+| 1 | L1 | symbols | left thumb — tap for one key, hold for as long as you like |
+| 2 | L2 | numbers, media, clipboard | right thumb — tap for one key, hold 250 ms to lock |
 | 3 | L3 | pointer, arrows, browser | `34` from L2 |
-| 4 | L4 | Bluetooth, output, reset, F-row | `34` from L3 |
+| 4 | L4 | Bluetooth, output, reset, F-row | **hold** `34` from L3 |
