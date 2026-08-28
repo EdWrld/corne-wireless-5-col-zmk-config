@@ -12,9 +12,9 @@
 
 #define L0 0   // base
 #define L1 1   // symbols
-#define L2 2   // numbers / nav
-#define L3 3   // adjust
-#define L4 4   // mouse
+#define L2 2   // numbers / media
+#define L3 3   // pointer / nav
+#define L4 4   // adjust
 
 // Thumb positions 31 (left) and 34 (right) drive every layer change.
 //   base    31 = &slt L1, 34 = &slt L2   tap = sticky one key, hold 250ms = lock on
@@ -25,6 +25,7 @@
 //
 // Tab and Esc are at positions 0 and 10 on every non-base layer.
 
+// Unused by any layer; kept for a future mod-tap.
 &mt {
     flavor = "tap-preferred";
     tapping-term-ms = <200>;
@@ -76,34 +77,6 @@
         };
     };
 
-    // tmux prefix is C-Space; these fire prefix-then-key. All three are
-    // currently unreferenced by any layer.
-    macros {
-        tmux_below: tmux_below {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            wait-ms = <30>;
-            tap-ms = <30>;
-            bindings = <&kp LC(SPACE)>, <&kp DQT>;
-        };
-
-        tmux_right: tmux_right {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            wait-ms = <30>;
-            tap-ms = <30>;
-            bindings = <&kp LC(SPACE)>, <&kp PRCNT>;
-        };
-
-        tmux_zoom: tmux_zoom {
-            compatible = "zmk,behavior-macro";
-            #binding-cells = <0>;
-            wait-ms = <30>;
-            tap-ms = <30>;
-            bindings = <&kp LC(SPACE)>, <&kp Z>;
-        };
-    };
-
     combos {
         compatible = "zmk,combos";
 
@@ -114,6 +87,15 @@
             key-positions = <16 17>;
             layers = <L0>;
             bindings = <&kp ESC>;
+        };
+
+        // L+; -> Enter, base only. No require-prior-idle here: it needs to fire
+        // immediately after a letter, which is the :w<CR> rhythm.
+        combo_ret {
+            timeout-ms = <50>;
+            key-positions = <18 19>;
+            layers = <L0>;
+            bindings = <&kp RET>;
         };
 
         // Both layer thumbs -> base. Off L0, so the base thumbs are unaffected.
@@ -129,32 +111,33 @@
         compatible = "zmk,keymap";
         layer_0 {
             // x/y = tap x, hold y.  s = sticky.
-            // No Delete anywhere in the keymap.
+            // Delete and Tab are not on base; Tab is at position 0 on every other
+            // layer. Esc is the J+K combo, Enter is L+; .
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  |  ;  |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! |  /  |
-            //             |sCTL | L1  |sSFT |     | SPC | L2  | TAB |
+            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
                 &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L      &kp SEMI
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &kp FSLH
-                                      &sk LCTRL   &slt L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp TAB
+                                      &sk LCTRL   &slt L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp BSPC
             >;
         };
 
         layer_1 {
-            // Every symbol is direct; no Shift needed. All four brackets sit on one
-            // row. Blank cell is &trans -> base C.
-            // |TAB| @ | # | $ | % |     | ~ | ^ | * | & |BSPC|
+            // Every symbol is direct; no Shift needed. All four brackets sit on one row.
+            // ~ is not bound: it is Shift + the ` on this layer.
+            // |TAB| @ | # | % | $ |     | 0 | < | > | & |BSPC|
             // |ESC| ' | ` | | | \ |     | = | ( | ) | ! |RET |
-            // | - | " |   | + | _ |     | [ | { | } | ] | / |
+            // | - | " | * | + | _ |     | [ | { | } | ] | / |
             //             | -  | L0 | -  |     |sALT| L2 | -  |
             display-name = "L1";
             bindings = <
-                &kp TAB    &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp TILDE  &kp CARET  &kp STAR   &kp AMPS   &kp BSPC
+                &kp TAB    &kp AT     &kp HASH   &kp PRCNT  &kp DLLR      &kp N0     &kp LT     &kp GT     &kp AMPS   &kp BSPC
                 &kp ESC    &kp SQT    &kp GRAVE  &kp PIPE   &kp BSLH      &kp EQUAL  &kp LPAR   &kp RPAR   &kp EXCL   &kp RET
-                &kp MINUS  &kp DQT    &trans     &kp PLUS   &kp UNDER     &kp LBKT   &kp LBRC   &kp RBRC   &kp RBKT   &kp FSLH
+                &kp MINUS  &kp DQT    &kp STAR   &kp PLUS   &kp UNDER     &kp LBKT   &kp LBRC   &kp RBRC   &kp RBKT   &kp FSLH
                                       &trans     &to L0     &trans        &sk RALT   &to L2     &trans
             >;
         };
@@ -176,31 +159,34 @@
         };
 
         layer_3 {
-            // A<n> = RALT+<n>.
-            // |TAB |A1  |A2  |A3  |A4  |     |F1 |F2 |F3 |F4 |BSPC|
-            // |ESC |BT0 |BT1 |BT2 |BT3 |     |F5 |F6 |F7 |F8 |RET |
-            // |CLR |USB |BLE |RST |BOOT|     |F9 |F10|F11|F12|A5  |
-            //             |A-  | L2 |BT4 |     |sALT| L4 |A= |
+            // Left hand drives the pointer, right hand is arrows + browser control.
+            // BACK/FWD  = Alt+Left / Alt+Right, sitting right above the <- and -> arrows
+            // C-S-TAB / C-TAB = previous / next tab      TABS = Ctrl+Shift+A, Chrome tab search
+            // |TAB |SCR<|MV^ |SCR>|    |     |BACK|C-S-TAB|C-TAB|FWD |BSPC|
+            // |ESC |MV< |MVv |MV> |DEL |     | <- |   v   |  ^  | -> |RET |
+            // |    |RCLK|SCR^|SCRv|    |     |HOME| PGDN  |PGUP |END |TABS|
+            //             | L0 | L2 |LCLK|     |sALT| L4 | -  |
             display-name = "L3";
             bindings = <
-                &kp TAB       &kp RA(N1)    &kp RA(N2)    &kp RA(N3)    &kp RA(N4)    &kp F1     &kp F2         &kp F3         &kp F4     &kp BSPC
-                &kp ESC       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &kp F5     &kp F6         &kp F7         &kp F8     &kp RET
-                &bt BT_CLR    &out OUT_USB  &out OUT_BLE  &sys_reset    &bootloader   &kp F9     &kp F10        &kp F11        &kp F12    &kp RA(N5)
-                                            &kp RA(MINUS) &to L2        &bt BT_SEL 4  &sk RALT   &to L4         &kp RA(EQUAL)
+                &kp TAB  &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &trans     &kp LA(LEFT)  &kp LC(LS(TAB))  &kp LC(TAB)  &kp LA(RIGHT)  &kp BSPC
+                &kp ESC  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &kp DEL    &kp LEFT      &kp DOWN         &kp UP       &kp RIGHT      &kp RET
+                &trans   &mkp RCLK       &msc SCRL_UP    &msc SCRL_DOWN   &trans     &kp HOME      &kp PG_DN        &kp PG_UP    &kp END        &kp LC(LS(A))
+                                         &to L0          &to L2           &mkp LCLK  &sk RALT   &to L4           &trans
             >;
         };
 
         layer_4 {
-            // |TAB |SCR<|MV^ |SCR>| -  |     | - | -  | -  | -  |BSPC|
-            // |ESC |MV< |MVv |MV> | -  |     | - |LCLK|MCLK|RCLK|RET |
-            // | -  |SCRv|SCR^| -  | -  |     | - | -  | -  | -  | -  |
-            //             | L0 | L3 | -  |     | - | L0 | -  |
+            // Blank cells fall through to base.
+            // |TAB |    |    |    |BT4 |     |F1 |F2 |F3 |F4 |BSPC|
+            // |ESC |BT0 |BT1 |BT2 |BT3 |     |F5 |F6 |F7 |F8 |RET |
+            // |CLR |USB |BLE |RST |BOOT|     |F9 |F10|F11|F12|    |
+            //             | -  | L3 | -  |     |sALT| L0 | -  |
             display-name = "L4";
             bindings = <
-                &kp TAB &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &trans     &trans  &trans     &trans     &trans     &kp BSPC
-                &kp ESC &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &trans     &trans  &mkp LCLK  &mkp MCLK  &mkp RCLK  &kp RET
-                &trans  &msc SCRL_DOWN  &msc SCRL_UP    &trans           &trans     &trans  &trans     &trans     &trans     &trans
-                                        &to L0          &to L3           &trans     &trans  &to L0     &trans
+                &kp TAB       &trans        &trans        &trans        &bt BT_SEL 4  &kp F1     &kp F2         &kp F3         &kp F4     &kp BSPC
+                &kp ESC       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &kp F5     &kp F6         &kp F7         &kp F8     &kp RET
+                &bt BT_CLR    &out OUT_USB  &out OUT_BLE  &sys_reset    &bootloader   &kp F9     &kp F10        &kp F11        &kp F12    &trans
+                                            &trans        &to L3        &trans        &sk RALT   &to L0         &trans
             >;
         };
 
