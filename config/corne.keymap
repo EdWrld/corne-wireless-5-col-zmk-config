@@ -132,14 +132,14 @@
             // Delete and Tab are not on base; Tab is at position 0 on every other
             // layer. Esc is the J+K combo, Enter is L+; .
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |
-            // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  |  ;  |
+            // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | '/; |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! |  /  |
             //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |   L1: tap = one key, hold = momentary
             //                                                            L2: tap = one key, hold = lock on
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
-                &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L      &kp SQT
+                &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L      &td SEMI SQT
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &kp FSLH
                                       &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp BSPC
             >;
@@ -151,15 +151,15 @@
             // All three bracket pairs share two columns - openers on the index,
             // closers on the middle - so only the row changes between them.
             // |TAB| @ | # | % | $ |     | 0 | { | } | & |BSPC|
-            // |ESC| ! | ` | | | ? |     | = | ( | ) | ' |RET |
-            // | - | " | * | \ | _ |     | < | [ | ] | > | / |
+            // |ESC| " | * | ? | | |     | = | ( | ) | ; |RET |
+            // | - | ! | ` | \ | _ |     | < | [ | ] | > | / |
             //             | -  | L0 | -  |     |sALT| L2 | -  |
             display-name = "L1";
             bindings = <
                 &kp TAB    &kp AT     &kp HASH   &kp PRCNT  &kp DLLR      &kp N0     &kp LBRC   &kp RBRC   &kp AMPS   &kp BSPC
                 &kp ESC    &kp DQT   &kp STAR   &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp SEMI  &kp RET
                 &kp MINUS  &kp EXCL   &kp GRAVE  &kp BSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp FSLH
-                                      &trans     &to L0     &kp LGUI      &sk RALT   &to L2     &trans
+                                      &trans     &to L0     &trans        &sk RALT   &to L2     &trans
             >;
         };
 
