@@ -11,8 +11,8 @@
 #include <dt-bindings/zmk/pointing.h>
 
 #define L0 0   // base
-#define L1 1   // nav / numpad
-#define L2 2   // symbols
+#define L1 1   // symbols
+#define L2 2   // numbers / nav
 #define L3 3   // adjust
 #define L4 4   // mouse
 
@@ -76,7 +76,8 @@
         };
     };
 
-    // tmux prefix is C-Space. These fire prefix-then-key.
+    // tmux prefix is C-Space; these fire prefix-then-key. All three are
+    // currently unreferenced by any layer.
     macros {
         tmux_below: tmux_below {
             compatible = "zmk,behavior-macro";
@@ -94,7 +95,6 @@
             bindings = <&kp LC(SPACE)>, <&kp PRCNT>;
         };
 
-        // Unused.
         tmux_zoom: tmux_zoom {
             compatible = "zmk,behavior-macro";
             #binding-cells = <0>;
@@ -129,7 +129,7 @@
         compatible = "zmk,keymap";
         layer_0 {
             // x/y = tap x, hold y.  s = sticky.
-            // No Delete, and no Alt or GUI, anywhere in the keymap.
+            // No Delete anywhere in the keymap.
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  |  ;  |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! |  /  |
@@ -144,35 +144,34 @@
         };
 
         layer_1 {
-            // Left hand: tmux, window, arrows.  Right hand: numpad.
-            // |TAB |^H  |^J  |^K  |^L  |     |PGUP| 7 | 8 | 9 |BSPC|
-            // |ESC | <- | v  | ^  | -> |     |PGDN| 4 | 5 | 6 |RET |
-            // |SPL-|SPL||PFX |HOME|END |     | 0  | 1 | 2 | 3 | .  |
-            //             |W<- | L0 | -  |     |sALT| L2 |W-> |
+            // Every symbol is direct; no Shift needed. All four brackets sit on one
+            // row. Blank cell is &trans -> base C.
+            // |TAB| @ | # | $ | % |     | ~ | ^ | * | & |BSPC|
+            // |ESC| ' | ` | | | \ |     | = | ( | ) | ! |RET |
+            // | - | " |   | + | _ |     | [ | { | } | ] | / |
+            //             | -  | L0 | -  |     |sALT| L2 | -  |
             display-name = "L1";
             bindings = <
-                &kp TAB        &kp LC(H)      &kp LC(J)     &kp LC(K)  &kp LC(L)     &kp PG_UP  &kp N7     &kp N8     &kp N9     &kp BSPC
-                &kp ESC        &kp LEFT       &kp DOWN      &kp UP     &kp RIGHT     &kp PG_DN  &kp N4     &kp N5     &kp N6     &kp RET
-                &tmux_below    &tmux_right    &kp LC(SPACE) &kp HOME   &kp END       &kp N0     &kp N1     &kp N2     &kp N3     &kp DOT
-                                              &kp LA(LS(H)) &to L0     &trans        &sk RALT   &to L2     &kp LA(LS(L))
+                &kp TAB    &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp TILDE  &kp CARET  &kp STAR   &kp AMPS   &kp BSPC
+                &kp ESC    &kp SQT    &kp GRAVE  &kp PIPE   &kp BSLH      &kp EQUAL  &kp LPAR   &kp RPAR   &kp EXCL   &kp RET
+                &kp MINUS  &kp DQT    &trans     &kp PLUS   &kp UNDER     &kp LBKT   &kp LBRC   &kp RBRC   &kp RBKT   &kp FSLH
+                                      &trans     &to L0     &trans        &sk RALT   &to L2     &trans
             >;
         };
 
         layer_2 {
-            // Unshifted sources only; Shift produces the pair, as on a full keyboard:
-            //   [ ] -> { }    \ -> |    ` -> ~    ' -> "    - -> _    = -> +
-            // Blank cells fall through to base, so , . / and Shift's < > ? still work.
-            // ! @ # $ % ^ & * ( ) are direct, since L1's digits are in numpad order.
-            // |TAB| @ | # | $ | % |     | [ | ] |   |   |BSPC|
-            // |ESC| ' | ` |   | \ |     | ! | ( | = | ) |RET |
-            // | - |   |   | ^ |   |     | & | * | , | . | / |
-            //             | -  | L1 |sALT|     | -  | L3 | -  |
+            // Right hand: numpad. Left hand: clipboard, media, math operators.
+            // CUT/COPY/PSTE sit in the same columns as base X C V.
+            // |TAB |CUT |COPY|PSTE| -  |     | _ | 7 | 8 | 9 |BSPC|
+            // |ESC |PSCR|VOL-|VOL+| +  |     | = | 4 | 5 | 6 |RET |
+            // |    | *  |BRI-|BRI+|MUTE|     | 0 | 1 | 2 | 3 | .  |
+            //             |sCTL| L1 |GUI |     |sALT| L3 | -  |
             display-name = "L2";
             bindings = <
-                &kp TAB    &kp AT     &kp HASH   &kp DLLR   &kp PRCNT     &kp LBKT   &kp RBKT   &trans     &trans     &kp BSPC
-                &kp ESC    &kp SQT    &kp GRAVE  &trans     &kp BSLH      &kp EXCL   &kp LPAR   &kp EQUAL  &kp RPAR   &kp RET
-                &kp MINUS  &trans     &trans     &kp CARET  &trans        &kp AMPS   &kp STAR   &trans     &trans     &trans
-                                      &trans     &to L1     &trans        &sk RALT   &to L3     &trans
+                &kp TAB    &kp K_CUT  &kp K_COPY    &kp K_PASTE   &kp MINUS     &kp UNDER  &kp N7     &kp N8     &kp N9     &kp BSPC
+                &kp ESC    &kp PSCRN  &kp C_VOL_DN  &kp C_VOL_UP  &kp PLUS      &kp EQUAL  &kp N4     &kp N5     &kp N6     &kp RET
+                &trans     &kp STAR   &kp C_BRI_DN  &kp C_BRI_UP  &kp C_MUTE    &kp N0     &kp N1     &kp N2     &kp N3     &kp DOT
+                                      &sk LCTRL     &to L1        &kp LGUI      &sk RALT   &to L3     &trans
             >;
         };
 
