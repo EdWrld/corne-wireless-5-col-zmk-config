@@ -22,7 +22,7 @@ they differ on the hold, because symbols and numbers are typed differently:
 | --- | --- | --- |
 | tap | that layer for **exactly one key** | same |
 | hold | **momentary** — live while held, gone on release | past 250 ms, **locked on** and stays |
-| both thumbs together | back to base, from any layer | same |
+| both thumbs together | **from base:** NAV, live while held. **from L1–L4:** back to base | same |
 
 Symbols arrive in runs — `()`, `->`, `{}`, `=>` — so holding is the natural
 gesture and locking has little to do. Numbers are the opposite: one long digit
@@ -34,7 +34,11 @@ On every non-base layer those same two positions become plain `&to` switches —
 ```
     L0 --34--> L1 --34--> L2 --34--> L3 ··hold 34··> L4
        <--31--    <--31--    <--31--
+
+    L0 <── both layer thumbs held ──> L5 (NAV)
 ```
+
+NAV is a spur, not a ring member. L1–L4 keep their jobs; window switching does not walk through numbers to get there.
 
 **L4 is the exception: hold, never tap.** Tapping the step-in thumb one time too
 many used to land you on the adjust layer with `sys_reset`, `bootloader` and the
@@ -45,8 +49,8 @@ second key on the other hand.
 L1 cannot be locked from its own key. To lock it, hold the right thumb past
 250 ms to lock L2, then tap position 31 — which is `&to L1` there.
 
-`Tab` and `Esc` sit at positions 0 and 10 on every non-base layer, so they are in
-the same place no matter where you are.
+`Tab` and `Esc` sit at positions 0 and 10 on L1–L4, so they are in the same
+place no matter where you are. NAV is the exception: its top row is `Alt+1`–`9`.
 
 ---
 
@@ -184,17 +188,44 @@ position 34 while on L3 — never by tapping — so it cannot be stumbled into.
 
 ---
 
+## L5 — Windows (NAV)
+
+Spur off base. Hold **both layer thumbs** (positions 31 and 34); the layer is
+live while they are down and gone when they come up. Same two keys that mean
+“go home” everywhere else.
+
+Top row is a split number row with Alt already applied — tap slot 3, the host
+sees `Alt+3`. No Alt key, no L2.
+
+╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
+│  A-1  │  A-2  │  A-3  │  A-4  │  A-5  │   │  A-6  │  A-7  │  A-8  │  A-9  │   ·   │
+├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
+│   ·   │   ·   │   ·   │   ·   │   ·   │   │   ·   │   ·   │   ·   │   ·   │   ·   │
+├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
+│   ·   │   ·   │   ·   │   ·   │   ·   │   │   ·   │   ·   │   ·   │   ·   │   ·   │
+╰───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────╯
+                ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
+                │   ·   │   ·   │   ·   │   │   ·   │   ·   │   ·   │
+                ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
+
+Blank cells fall through to base. The two thumbs must go down within 50 ms of
+each other, same window as the home combo, so a normal tap of one layer thumb
+is still symbols or numbers.
+
+---
+
 ## Combos
 
 | Keys | Sends | Window | Live on |
 | --- | --- | --- | --- |
 | `J` + `K` | `Esc` | 50 ms | base only |
 | `L` + `;` | `Enter` | 50 ms | base only |
+| both layer thumbs | NAV, while held | 50 ms | base only |
 | both layer thumbs | back to base | 50 ms | L1–L4 |
 
 The escape chord is scoped off base on purpose. ZMK picks combo candidates from
-the highest active layer at the **first** keypress, so on base it is never a
-candidate and the two thumb keys behave normally.
+the highest active layer at the **first** keypress, so `combo_to_base` is never
+a candidate on home — both thumbs there are `combo_nav` instead.
 
 `combo_esc` carries `require-prior-idle-ms = 100`, meaning it will not fire
 within 100 ms of another keypress — which is exactly the insert-mode-exit
@@ -264,3 +295,4 @@ you want to keep them.
 | 2 | L2 | numbers, media, clipboard | right thumb — tap for one key, hold 250 ms to lock |
 | 3 | L3 | pointer, arrows, browser | `34` from L2 |
 | 4 | L4 | Bluetooth, output, reset, F-row | **hold** `34` from L3 |
+| 5 | NAV | `Alt+1`–`9` window hops | both layer thumbs, from base, while held |

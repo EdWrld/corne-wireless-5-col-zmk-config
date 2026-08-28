@@ -13,21 +13,24 @@
 #define L0 0   // base
 #define L1 1   // symbols
 #define L2 2   // numbers / media
-#define L3 3   // pointer / nav
+#define L3 3   // pointer / browser
 #define L4 4   // adjust
+#define L5 5   // windows (spur)
 
 // Thumb positions 31 (left) and 34 (right) drive every layer change.
 //   base    31 = &slm L1   tap = sticky one key, hold = momentary while held
 //           34 = &slt L2   tap = sticky one key, hold 250ms = lock on
+//           31+34 = NAV, live while both are held — not on the ring
 //   L1-L4   31 = step out, 34 = step in, 31+34 = back to base
 //
 //     L0 --34--> L1 --34--> L2 --34--> L3 ..hold 34..> L4
 //        <--31--    <--31--    <--31--
+//     L0 <── 31+34 hold ──> L5 (NAV)
 //
 // L4 is the exception: hold, never tap, so the radios and bootloader cannot be
 // reached by tapping the step-in thumb one time too many.
 //
-// Tab and Esc are at positions 0 and 10 on every non-base layer.
+// Tab and Esc are at positions 0 and 10 on L1–L4. NAV’s top row is Alt+1–9.
 
 // Unused by any layer; kept for a future mod-tap.
 &mt {
@@ -123,6 +126,18 @@
             layers = <L1 L2 L3 L4>;
             bindings = <&to L0>;
         };
+
+        // Both layer thumbs from base -> NAV. slow-release keeps the layer
+        // up until both thumbs come up, so one lifting early does not dump
+        // you mid-hop. Not listed on combo_to_base: releasing the hold is
+        // the exit, and the same keys must not fire &to L0 while NAV is on.
+        combo_nav {
+            timeout-ms = <50>;
+            slow-release;
+            key-positions = <31 34>;
+            layers = <L0>;
+            bindings = <&mo L5>;
+        };
     };
 
     keymap {
@@ -212,6 +227,22 @@
                 &kp TAB       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &kp F5     &kp F6         &kp F7         &kp F8     &kp RET
                 &bt BT_CLR    &out OUT_USB  &out OUT_BLE  &sys_reset    &bootloader   &kp F9     &kp F10        &kp F11        &kp F12    &trans
                                             &trans        &to L3        &trans        &sk RALT   &to L0         &trans
+            >;
+        };
+
+        layer_5 {
+            // Spur off base: both layer thumbs, live while held.
+            // Top row is a split number row with Alt already applied.
+            // |A-1 |A-2 |A-3 |A-4 |A-5 |     |A-6 |A-7 |A-8 |A-9 |    |
+            // |    |    |    |    |    |     |    |    |    |    |    |
+            // |    |    |    |    |    |     |    |    |    |    |    |
+            //             | -  | -  | -  |     | -  | -  | -  |
+            display-name = "NAV";
+            bindings = <
+                &kp LA(N1)  &kp LA(N2)  &kp LA(N3)  &kp LA(N4)  &kp LA(N5)  &kp LA(N6)  &kp LA(N7)  &kp LA(N8)  &kp LA(N9)  &trans
+                &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans
+                &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans
+                                        &trans      &trans      &trans      &trans      &trans      &trans
             >;
         };
 
