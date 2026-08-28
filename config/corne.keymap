@@ -65,12 +65,12 @@
             bindings = <&tog>, <&sl>;
         };
 
-        // &td <hold> <tap>, 150ms.
+        // &td <hold> <tap>, 200ms.
         td: tapdance {
             compatible = "zmk,behavior-hold-tap";
             label = "TAPDANCE";
             #binding-cells = <2>;
-            tapping-term-ms = <150>;
+            tapping-term-ms = <200>;
             quick-tap-ms = <0>;
             flavor = "tap-preferred";
             bindings = <&kp>, <&kp>;
@@ -128,16 +128,16 @@
 
         layer_1 {
             // Every symbol is direct; no Shift needed. All four brackets sit on one row.
-            // ~ is not bound: it is Shift + the ` on this layer.
+            // ~ and + are not bound: they are Shift + the ` and = on this layer.
             // |TAB| @ | # | % | $ |     | 0 | < | > | & |BSPC|
-            // |ESC| ' | ` | | | \ |     | = | ( | ) | ! |RET |
-            // | - | " | * | + | _ |     | [ | { | } | ] | / |
+            // |ESC| ! | ` | | | ? |     | = | ( | ) | ' |RET |
+            // | - | " | * | \ | _ |     | [ | { | } | ] | / |
             //             | -  | L0 | -  |     |sALT| L2 | -  |
             display-name = "L1";
             bindings = <
                 &kp TAB    &kp AT     &kp HASH   &kp PRCNT  &kp DLLR      &kp N0     &kp LT     &kp GT     &kp AMPS   &kp BSPC
-                &kp ESC    &kp SQT    &kp GRAVE  &kp PIPE   &kp BSLH      &kp EQUAL  &kp LPAR   &kp RPAR   &kp EXCL   &kp RET
-                &kp MINUS  &kp DQT    &kp STAR   &kp PLUS   &kp UNDER     &kp LBKT   &kp LBRC   &kp RBRC   &kp RBKT   &kp FSLH
+                &kp ESC    &kp EXCL   &kp GRAVE  &kp PIPE   &kp QMARK     &kp EQUAL  &kp LPAR   &kp RPAR   &kp SQT    &kp RET
+                &kp MINUS  &kp DQT    &kp STAR   &kp BSLH   &kp UNDER     &kp LBKT   &kp LBRC   &kp RBRC   &kp RBKT   &kp FSLH
                                       &trans     &to L0     &trans        &sk RALT   &to L2     &trans
             >;
         };

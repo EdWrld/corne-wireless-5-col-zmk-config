@@ -115,7 +115,9 @@ function splitCells(value) {
 
 function parseKeymap(src) {
     const defines = {};
-    for (const m of src.matchAll(/^\s*#define\s+(\w+)\s+(\d+)\s*$/gm))
+    // Trailing `// comment` on a #define line is normal and must not stop the
+    // match, or every layer reference falls back to NaN and silently degrades.
+    for (const m of src.matchAll(/^\s*#define\s+(\w+)\s+(\d+)\s*(?:\/\/.*)?$/gm))
         defines[m[1]] = parseInt(m[2], 10);
 
     const clean = stripComments(src);
@@ -212,15 +214,23 @@ const GLYPH = {
     TAB: '⇥', ESC: 'Esc', CAPS: 'Caps', INS: 'Ins', PSCRN: 'PrtSc',
     LEFT: '←', RIGHT: '→', UP: '↑', DOWN: '↓',
     HOME: 'Home', END: 'End', PG_UP: 'PgUp', PG_DN: 'PgDn',
-    LSHFT: 'Shift', RSHFT: 'Shift', LCTRL: 'Ctrl', RCTRL: 'Ctrl',
+    LSHFT: 'Shift', RSHFT: 'Shift', LSHIFT: 'Shift', RSHIFT: 'Shift',
+    LCTRL: 'Ctrl', RCTRL: 'Ctrl', LCTL: 'Ctrl', RCTL: 'Ctrl',
     LALT: 'Alt', RALT: 'AltGr', LGUI: 'Super', RGUI: 'Super',
+    K_CUT: 'Cut', K_COPY: 'Copy', K_PASTE: 'Paste',
+    C_MUTE: 'Mute', C_VOL_UP: 'Vol+', C_VOL_DN: 'Vol-',
+    C_BRI_UP: 'Bri+', C_BRI_DN: 'Bri-',
 };
 
 const FULLNAME = {
     RET: 'Enter', SPACE: 'Space', BSPC: 'Backspace', DEL: 'Delete', TAB: 'Tab',
     ESC: 'Escape', PG_UP: 'Page Up', PG_DN: 'Page Down',
-    LSHFT: 'Left Shift', LCTRL: 'Left Ctrl', LALT: 'Left Alt', LGUI: 'Left Super',
-    RALT: 'Right Alt (AltGr)',
+    LSHFT: 'Left Shift', LSHIFT: 'Left Shift', RSHIFT: 'Right Shift',
+    LCTRL: 'Left Ctrl', LCTL: 'Left Ctrl', LALT: 'Left Alt', LGUI: 'Left Super',
+    RALT: 'Right Alt (AltGr)', PSCRN: 'Print Screen',
+    K_CUT: 'Cut', K_COPY: 'Copy', K_PASTE: 'Paste',
+    C_MUTE: 'Mute', C_VOL_UP: 'Volume up', C_VOL_DN: 'Volume down',
+    C_BRI_UP: 'Brightness up', C_BRI_DN: 'Brightness down',
 };
 
 // Spoken names for the symbol keys — the glyph alone is not always obvious in
@@ -259,7 +269,8 @@ function ch(name) {
 }
 const MOD_WORD = { LC: 'Ctrl+', RC: 'RCtrl+', LS: 'Shift+', RS: 'RShift+', LA: 'Alt+', RA: 'AltGr+', LG: 'Super+', RG: 'RSuper+' };
 
-const PLAIN_MODS = new Set(['LSHFT', 'RSHFT', 'LCTRL', 'RCTRL', 'LALT', 'RALT', 'LGUI', 'RGUI']);
+const PLAIN_MODS = new Set(['LSHFT', 'RSHFT', 'LSHIFT', 'RSHIFT', 'LCTRL', 'RCTRL',
+                            'LCTL', 'RCTL', 'LALT', 'RALT', 'LGUI', 'RGUI']);
 
 function keyGlyph(code) {
     const wrap = code.match(/^([LR][CSAG])\((.*)\)$/);
@@ -349,6 +360,23 @@ function resolve(model, binding) {
         return cap(layerLabel(model, args[0]), 'layer', `toggle the ${layerLabel(model, args[0])} layer`);
     case 'sl':
         return cap(layerLabel(model, args[0]), 'layer', `sticky ${layerLabel(model, args[0])} layer`);
+    case 'sk':
+        return cap(keyGlyph(args[0] || ''), 'mod',
+            `sticky ${keyWords(args[0] || '')} ${ch('dash')} applies to the next key, and survives a layer change`);
+    case 'mmv':
+    case 'msc': {
+        const dir = (args[0] || '').replace(/^(MOVE|SCRL)_/, '');
+        const moving = beh === 'mmv';
+        return cap(`${moving ? 'Mv' : 'Scr'}${keyGlyph(dir)}`, 'macro',
+            `${moving ? 'move the pointer' : 'scroll'} ${dir.toLowerCase()}`);
+    }
+    case 'mkp': {
+        const map = { LCLK: ['L clk', 'left click'], RCLK: ['R clk', 'right click'],
+                      MCLK: ['M clk', 'middle click'], MB4: ['Btn 4', 'mouse button 4'],
+                      MB5: ['Btn 5', 'mouse button 5'] };
+        const hit = map[args[0]];
+        return hit ? cap(hit[0], 'macro', hit[1]) : cap(args.join(' '), 'macro', `mouse ${args.join(' ')}`);
+    }
     case 'lt':
         return {
             tap: keyGlyph(args[1] || ''),
@@ -407,30 +435,53 @@ function posName(pos) {
 
 // Walk every layer looking for the key that reaches `target`, so the overlay
 // can tell you how to get there rather than just what is on it.
+// How a layer behaves when it is the TAP half of a hold-tap, and when it is
+// the HOLD half. A key can be both at once - `slt L1 L1` is tog-on-hold and
+// sl-on-tap - so the hint names both.
+const LAYER_VERB_TAP  = { mo: 'tap-and-hold', to: 'tap to switch', tog: 'tap to lock', sl: 'tap for one key' };
+const LAYER_VERB_HOLD = { mo: 'hold', to: 'hold to switch', tog: 'hold to lock', sl: 'hold' };
+
 function accessHint(model, target) {
+    if (target === 0) return 'default layer';
     for (const cond of model.conditionals) {
         const then = model.defines[cond.thenLayer] !== undefined
             ? model.defines[cond.thenLayer] : parseInt(cond.thenLayer, 10);
         if (then === target)
             return 'hold ' + cond.ifLayers.map(l => layerLabel(model, l)).join(' + ');
     }
+    const hits = ref => {
+        if (ref === undefined) return false;
+        const idx = model.defines[ref] !== undefined ? model.defines[ref] : parseInt(ref, 10);
+        return idx === target;
+    };
     for (let li = 0; li < model.layers.length; li++) {
         const keys = model.layers[li].keys;
         for (let pos = 0; pos < keys.length; pos++) {
             const toks = keys[pos].trim().split(/\s+/);
             const custom = model.behaviors[toks[0]];
-            let ref = null;
-            if (toks[0] === 'mo' || toks[0] === 'to' || toks[0] === 'tog' || toks[0] === 'sl') ref = toks[1];
-            else if (toks[0] === 'lt') ref = toks[1];
-            else if (custom && custom.inner[0] === 'mo') ref = toks[1];
-            if (ref === null) continue;
-            const idx = model.defines[ref] !== undefined ? model.defines[ref] : parseInt(ref, 10);
-            if (idx !== target) continue;
-            const label = resolve(model, keys[pos]).tap;
-            return `hold ${label}${ch('mid')}${posName(pos)}`;
+            const how = [];
+            if (LAYER_VERB_TAP[toks[0]] && hits(toks[1])) {
+                how.push(toks[0] === 'mo' ? 'hold' : LAYER_VERB_TAP[toks[0]]);
+            } else if (toks[0] === 'lt' && hits(toks[1])) {
+                how.push('hold');
+            } else if (custom && custom.inner.length === 2) {
+                // hold binding takes the first arg, tap binding the second
+                if (LAYER_VERB_HOLD[custom.inner[0]] && hits(toks[1])) how.push(LAYER_VERB_HOLD[custom.inner[0]]);
+                if (LAYER_VERB_TAP[custom.inner[1]] && hits(toks[2])) how.push(LAYER_VERB_TAP[custom.inner[1]]);
+            }
+            if (!how.length) continue;
+            const where = li === 0 ? posName(pos) : `${posName(pos)} on ${model.layers[li].display}`;
+            return how.join(ch('mid')) + ch('mid') + where;
         }
     }
     return 'always active';
+}
+
+// "on L0" / "on L1, L2, L3, L4" / "on every layer" - a combo scoped with
+// `layers` only fires while one of them is the highest active layer.
+function comboScope(model, combo) {
+    if (!combo.layers || !combo.layers.length) return 'every layer';
+    return 'on ' + combo.layers.map(l => layerLabel(model, l)).join(', ');
 }
 
 function keyLabelAt(model, layerIdx, pos) {
@@ -496,7 +547,7 @@ function dump(model) {
     print(`\n${ch('rule').repeat(2)} combos ${ch('rule').repeat(46)}`);
     for (const combo of model.combos) {
         const keys = combo.positions.map(p => keyLabelAt(model, 0, p)).join(' + ');
-        print(`  ${keys}  ${ch('arrow')}  ${resolve(model, combo.binding).detail}  (${combo.timeout} ms)`);
+        print(`  ${keys}  ${ch('arrow')}  ${resolve(model, combo.binding).detail}  (${combo.timeout} ms, ${comboScope(model, combo)})`);
     }
     for (const cond of model.conditionals) {
         const names = cond.ifLayers.map(l => layerLabel(model, l)).join(' + ');
@@ -1001,7 +1052,7 @@ function exportHtml(model, outPath, sourcePath) {
     for (const combo of model.combos) {
         const keys = combo.positions.map(pos => keyLabelAt(model, 0, pos)).join(' + ');
         extras.push(`<li><b>${esc(keys)}</b> ${ch('arrow')} ${esc(resolve(model, combo.binding).detail)}
-            <em>(within ${esc(combo.timeout)} ms)</em></li>`);
+            <em>(within ${esc(combo.timeout)} ms, ${esc(comboScope(model, combo))})</em></li>`);
     }
     for (const cond of model.conditionals) {
         const names = cond.ifLayers.map(l => layerLabel(model, l)).join(' + ');

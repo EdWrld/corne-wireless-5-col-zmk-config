@@ -14,18 +14,20 @@ keep in sync. Edit the keymap and the overlay redraws within a moment.
 
 ## What it shows
 
-- All four layers (Base, Nav, Sym, Adj), one at a time, on the real 5-column
-  Corne shape including the column stagger and the thumb clusters.
-- Hold behaviours in small blue text above the tap legend, so `A` reads as
-  *Ctrl on hold, A on tap*.
-- Layer keys in amber, macros in green, Bluetooth/reset keys in pink, and
-  `&trans` keys greyed out to `▽`.
+- All five layers (L0 base, L1 symbols, L2 numbers/media, L3 pointer/nav,
+  L4 adjust), one at a time, on the real 5-column Corne shape including the
+  column stagger and the thumb clusters.
+- Hold behaviours in small blue text above the tap legend, so `O` reads as
+  *minus on hold, O on tap*.
+- Layer keys in amber, pointer keys in green, Bluetooth/reset keys in pink,
+  and `&trans` keys greyed out to `▽`.
 - Under the title, how to reach the layer you are looking at — e.g.
-  `hold ⏎ · left thumb` for Sym.
-- The combos and conditional layers along the bottom (`J+K → Esc`,
-  `Nav+Sym → Adj`).
+  `hold to lock · tap for one key · left thumb` for L1, or
+  `tap to switch · right thumb on L2` for L3.
+- The combos along the bottom, with the layers each one is live on
+  (`J+K → Esc`, `L+; → Enter`, both layer thumbs → base).
 - Hover any key for the full story, including hold-tap timings:
-  `tap A · hold Left Ctrl — hm (balanced, 200 ms hold, disabled within 150 ms of a keypress)`
+  `tap O · hold -  minus — td (tap-preferred, 150 ms hold)`
 
 ## Using it
 
@@ -44,7 +46,7 @@ Position, layer, opacity and size are remembered in
 
 The window deliberately never takes keyboard focus, so clicking it does not
 interrupt whatever you were typing into. Pass `--focus` if you would rather
-have keyboard shortcuts (`1`–`4` for layers, `+`/`-`, `s` for size, `q` to
+have keyboard shortcuts (`1`–`5` for layers, `+`/`-`, `s` for size, `q` to
 quit).
 
 ## Does it follow my edits?
@@ -72,7 +74,7 @@ zmk-cheatsheet [path/to/file.keymap] [options]
   --dump         print the cheat sheet to the terminal and exit
   --html [FILE]  write a standalone HTML cheat sheet and exit
   --ascii        plain-text glyphs, for hosts without a Unicode font
-  --focus        let the overlay take keyboard focus (1-4, +/-, s, q)
+  --focus        let the overlay take keyboard focus (1-5, +/-, s, q)
   --scale N      0.85 | 1.0 | 1.2 | 1.45
 ```
 
@@ -90,10 +92,10 @@ fallback for any environment where a floating window is awkward:
 SSH or for a quick diff after editing the keymap:
 
 ```
-$ ./tools/keymap-overlay/zmk-cheatsheet.js --dump
-── Base  (layer 0) ───────────────────────────────
-  Q(⇥)      W         E         R         T            Y  U  I  O  P
-  A(Ctrl)   S         D         F         G            H  J  K  L  ;
+$ ./tools/keymap-overlay/zmk-cheatsheet --dump
+── L0  (layer 0) ─────────────────────────────────
+  Q         W         E         R         T            Y  U  I  O(-)  P
+  A         S         D         F         G            H  J  K  L     ;
   ...
 ```
 
@@ -157,5 +159,11 @@ page you can open from Windows:
 The keymap is parsed into a plain object (layers, behaviors, macros, combos,
 conditional layers) and each binding is turned into `{tap, hold, kind, detail}`
 by `resolve()`. Teaching it a new behaviour means adding one `case` there —
-`&kp`, `&mo`, `&lt`, `&mt`, `&bt`, `&out`, `&sys_reset`, `&bootloader`, any
-`zmk,behavior-hold-tap`, and any macro are already handled.
+`&kp`, `&mo`, `&to`, `&tog`, `&sl`, `&sk`, `&lt`, `&mt`, `&mmv`, `&msc`,
+`&mkp`, `&bt`, `&out`, `&sys_reset`, `&bootloader`, any `zmk,behavior-hold-tap`,
+and any macro are already handled.
+
+`accessHint()` is the other place worth knowing about: it builds the subtitle by
+scanning every layer for a key that reaches the one you are looking at, and it
+reads both halves of a hold-tap, so `&slt L1 L1` (`&tog` on hold, `&sl` on tap)
+is described as both.
