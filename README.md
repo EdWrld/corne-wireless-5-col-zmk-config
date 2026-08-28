@@ -88,7 +88,7 @@ row does: `{}` on top, `()` on home, `[]` below.
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │   ⇥   │   @   │   #   │   %   │   $   │   │   0   │   {   │   }   │   &   │   ⌫   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│  Esc  │   !   │   `   │   |   │   ?   │   │   =   │   (   │   )   │   '   │   ⏎   │
+│  Esc  │   !   │   `   │   ?   │   |   │   │   '   │   (   │   )   │   =   │   ⏎   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │   -   │   "   │   *   │   \   │   _   │   │   <   │   [   │   ]   │   >   │   /   │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
@@ -140,11 +140,11 @@ where `Delete`, `Home`/`End` and `PgUp`/`PgDn` live — each page key sits direc
 under its arrow.
 
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
-│   ⇥   │  Scr← │  Mv↑  │  Scr→ │   ·   │   │  A-←  │ C-S-⇥ │  C-⇥  │  A-→  │   ⌫   │
+│   ⇥   │  Scr← │  Mv↑  │  Scr→ │  C-T  │   │  A-←  │ C-S-⇥ │  C-⇥  │  A-→  │   ⌫   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │  Esc  │  Mv←  │  Mv↓  │  Mv→  │   ⌦   │   │   ←   │   ↓   │   ↑   │   →   │   ⏎   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ·   │  RClk │  Scr↑ │  Scr↓ │   ·   │   │  Home │  PgDn │  PgUp │  End  │ C-S-A │
+│   ·   │  RClk │  Scr↑ │  Scr↓ │  C-W  │   │  Home │  PgDn │  PgUp │  End  │ C-S-A │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
                 │   L0  │   L2  │  LClk │   │ sAltGr│   L4  │   ·   │
@@ -155,6 +155,7 @@ under its arrow.
 | `A-←` `A-→` | `Alt+Left` / `Alt+Right` | Back / Forward — works in Firefox, Chrome, file managers |
 | `C-S-⇥` `C-⇥` | `Ctrl+Shift+Tab` / `Ctrl+Tab` | previous / next tab |
 | `C-S-A` | `Ctrl+Shift+A` | Chrome tab search — **in Firefox this opens the Add-ons manager instead** |
+| `C-T` `C-W` | `Ctrl+T` / `Ctrl+W` | new tab / close tab — same column, top opens and bottom closes |
 
 Pointer keys need `CONFIG_ZMK_POINTING=y`, which is set. Note that enabling it
 changes the HID report descriptor, so a host you were already paired with may

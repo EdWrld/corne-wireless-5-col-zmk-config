@@ -139,7 +139,7 @@
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
-                &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L      &kp SEMI
+                &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L      &kp SQT
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &kp FSLH
                                       &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp BSPC
             >;
@@ -157,8 +157,8 @@
             display-name = "L1";
             bindings = <
                 &kp TAB    &kp AT     &kp HASH   &kp PRCNT  &kp DLLR      &kp N0     &kp LBRC   &kp RBRC   &kp AMPS   &kp BSPC
-                &kp ESC    &kp EXCL   &kp GRAVE  &kp QMARK  &kp PIPE      &kp SQT    &kp LPAR   &kp RPAR   &kp EQUAL  &kp RET
-                &kp MINUS  &kp DQT    &kp STAR   &kp BSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp FSLH
+                &kp ESC    &kp DQT   &kp STAR   &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp SEMI  &kp RET
+                &kp MINUS  &kp EXCL   &kp GRAVE  &kp BSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp FSLH
                                       &trans     &to L0     &kp LGUI      &sk RALT   &to L2     &trans
             >;
         };
@@ -183,15 +183,16 @@
             // Left hand drives the pointer, right hand is arrows + browser control.
             // BACK/FWD  = Alt+Left / Alt+Right, sitting right above the <- and -> arrows
             // C-S-TAB / C-TAB = previous / next tab      TABS = Ctrl+Shift+A, Chrome tab search
-            // |TAB |SCR<|MV^ |SCR>|    |     |BACK|C-S-TAB|C-TAB|FWD |BSPC|
+            // C-T / C-W = new tab / close tab, same column: top opens, bottom closes.
+            // |TAB |SCR<|MV^ |SCR>|C-T |     |BACK|C-S-TAB|C-TAB|FWD |BSPC|
             // |ESC |MV< |MVv |MV> |DEL |     | <- |   v   |  ^  | -> |RET |
-            // |    |RCLK|SCR^|SCRv|    |     |HOME| PGDN  |PGUP |END |TABS|
+            // |    |RCLK|SCR^|SCRv|C-W |     |HOME| PGDN  |PGUP |END |TABS|
             //             | L0 | L2 |LCLK|     |sALT| L4 | -  |   L4 is HOLD only, not a tap
             display-name = "L3";
             bindings = <
-                &kp TAB  &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &trans     &kp LA(LEFT)  &kp LC(LS(TAB))  &kp LC(TAB)  &kp LA(RIGHT)  &kp BSPC
+                &kp TAB  &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &kp LC(T)  &kp LA(LEFT)  &kp LC(LS(TAB))  &kp LC(TAB)  &kp LA(RIGHT)  &kp BSPC
                 &kp ESC  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &kp DEL    &kp LEFT      &kp DOWN         &kp UP       &kp RIGHT      &kp RET
-                &trans   &mkp RCLK       &msc SCRL_UP    &msc SCRL_DOWN   &trans     &kp HOME      &kp PG_DN        &kp PG_UP    &kp END        &kp LC(LS(A))
+                &trans   &mkp RCLK       &msc SCRL_UP    &msc SCRL_DOWN   &kp LC(W)  &kp HOME      &kp PG_DN        &kp PG_UP    &kp END        &kp LC(LS(A))
                                          &to L0          &to L2           &mkp LCLK  &sk RALT   &mo L4           &trans
             >;
         };
