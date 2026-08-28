@@ -95,7 +95,7 @@ row does: `{}` on top, `()` on home, `[]` below.
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │  Esc  │   "   │   *   │   ?   │   |   │   │   =   │   (   │   )   │   ;   │   ⏎   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   -   │   !   │   `   │   \   │   _   │   │   <   │   [   │   ]   │   >   │   /   │
+│   -   │   !   │   `   │   /   │   _   │   │   <   │   [   │   ]   │   >   │   \   │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
                 │   ·   │   L0  │   ·   │   │ sAltGr│   L2  │   ·   │
@@ -106,7 +106,9 @@ this layer, the same as on a full keyboard. Position 32 falls through to base's
 sticky `Shift`, so that works without leaving. `+` also has a direct key on L2.
 
 `<` and `>` are also reachable from base as `Shift+,` and `Shift+.`; they are
-duplicated here for convenience.
+duplicated here for convenience. `\` sits on the same pinky as base `/`, so
+hold Ctrl, hold L1, tap that pinky for `Ctrl+\` (Neovim terminal escape is
+`Ctrl+\` then `Ctrl+N`).
 
 ---
 
@@ -195,14 +197,18 @@ live while they are down and gone when they come up. Same two keys that mean
 “go home” everywhere else.
 
 Top row is a split number row with Alt already applied — tap slot 3, the host
-sees `Alt+3`. No Alt key, no L2.
+sees `Alt+3`. No Alt key, no L2. Left home-row `A S D F` send `Alt+Shift+H/J/K/L`
+for tmux panes: **A** left, **S** down, **D** up, **F** right. Right home-row
+`H J K L` are arrows in the same vim order (and the same cluster as L3).
+`M` (the same finger as `[` on L1) fires your tmux prefix `Ctrl+Space` then `[`,
+which is copy/scroll mode.
 
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │  A-1  │  A-2  │  A-3  │  A-4  │  A-5  │   │  A-6  │  A-7  │  A-8  │  A-9  │   ·   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ·   │   ·   │   ·   │   ·   │   ·   │   │   ·   │   ·   │   ·   │   ·   │   ·   │
+│ A-S-H │ A-S-J │ A-S-K │ A-S-L │   ·   │   │   ←   │   ↓   │   ↑   │   →   │   ·   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ·   │   ·   │   ·   │   ·   │   ·   │   │   ·   │   ·   │   ·   │   ·   │   ·   │
+│   ·   │   ·   │   ·   │   ·   │   ·   │   │   ·   │ scrl  │   ·   │   ·   │   ·   │
 ╰───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
                 │   ·   │   ·   │   ·   │   │   ·   │   ·   │   ·   │
@@ -218,12 +224,13 @@ is still symbols or numbers.
 
 | Keys | Sends | Window | Live on |
 | --- | --- | --- | --- |
-| `J` + `K` | `Esc` | 50 ms | base only |
-| `L` + `;` | `Enter` | 50 ms | base only |
+| `J` + `K` (positions 16+17) | `Esc` | 50 ms | every layer |
+| `L` + `'` (positions 18+19) | `Enter` | 50 ms | every layer |
 | both layer thumbs | NAV, while held | 50 ms | base only |
 | both layer thumbs | back to base | 50 ms | L1–L4 |
 
-The escape chord is scoped off base on purpose. ZMK picks combo candidates from
+These two are position combos, not letter combos: the same physical keys fire
+`Esc` / `Enter` on every layer, including NAV. ZMK picks combo candidates from
 the highest active layer at the **first** keypress, so `combo_to_base` is never
 a candidate on home — both thumbs there are `combo_nav` instead.
 
@@ -295,4 +302,4 @@ you want to keep them.
 | 2 | L2 | numbers, media, clipboard | right thumb — tap for one key, hold 250 ms to lock |
 | 3 | L3 | pointer, arrows, browser | `34` from L2 |
 | 4 | L4 | Bluetooth, output, reset, F-row | **hold** `34` from L3 |
-| 5 | NAV | `Alt+1`–`9` window hops | both layer thumbs, from base, while held |
+| 5 | NAV | `Alt+1`–`9` windows, tmux panes on ASDF, arrows on HJKL, prefix+`[` scroll | both layer thumbs, from base, while held |

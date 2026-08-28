@@ -98,24 +98,36 @@
         };
     };
 
+    macros {
+        // prefix (Ctrl+Space) then [ — tmux copy/scroll mode. wait/tap 40 ms
+        // so the host sees two distinct reports, not a mashed chord.
+        tmux_scroll: tmux_scroll {
+            compatible = "zmk,behavior-macro";
+            label = "TMUX_SCROLL";
+            #binding-cells = <0>;
+            wait-ms = <40>;
+            tap-ms = <40>;
+            bindings = <&kp LC(SPACE) &kp LBKT>;
+        };
+    };
+
     combos {
         compatible = "zmk,combos";
 
-        // J+K -> Esc, base only.
+        // Positions 16+17 (J+K on base) -> Esc, every layer.
         combo_esc {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
             key-positions = <16 17>;
-            layers = <L0>;
             bindings = <&kp ESC>;
         };
 
-        // L+; -> Enter, base only. No require-prior-idle here: it needs to fire
-        // immediately after a letter, which is the :w<CR> rhythm.
+        // Positions 18+19 (L+' on base) -> Enter, every layer. No
+        // require-prior-idle here: it needs to fire immediately after a
+        // letter, which is the :w<CR> rhythm.
         combo_ret {
             timeout-ms = <50>;
             key-positions = <18 19>;
-            layers = <L0>;
             bindings = <&kp RET>;
         };
 
@@ -145,7 +157,7 @@
         layer_0 {
             // x/y = tap x, hold y.  s = sticky.
             // Delete and Tab are not on base; Tab is at position 0 on every other
-            // layer. Esc is the J+K combo, Enter is L+; .
+            // layer. Esc is the J+K combo, Enter is L+; — both on every layer.
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | '/; |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! |  /  |
@@ -167,13 +179,13 @@
             // closers on the middle - so only the row changes between them.
             // |TAB| @ | # | % | $ |     | 0 | { | } | & |BSPC|
             // |ESC| " | * | ? | | |     | = | ( | ) | ; |RET |
-            // | - | ! | ` | \ | _ |     | < | [ | ] | > | / |
+            // | - | ! | ` | / | _ |     | < | [ | ] | > | \ |
             //             | -  | L0 | -  |     |sALT| L2 | -  |
             display-name = "L1";
             bindings = <
                 &kp ESC  &kp AT     &kp HASH   &kp PRCNT  &kp DLLR        &kp AMPS   &kp N0   &kp LBRC   &kp RBRC   &kp BSPC
                 &kp TAB     &kp DQT   &kp STAR   &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp COLON   &kp SEMI
-                &kp MINUS  &kp EXCL   &kp GRAVE  &kp BSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp FSLH
+                &kp MINUS  &kp EXCL   &kp GRAVE  &kp FSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp BSLH
                                       &trans     &to L0     &trans        &sk RALT   &to L2     &trans
             >;
         };
@@ -232,16 +244,19 @@
 
         layer_5 {
             // Spur off base: both layer thumbs, live while held.
-            // Top row is a split number row with Alt already applied.
+            // Top row: Alt+1–9 window hops.
+            // Left home ASDF: tmux panes (Alt+Shift+H/J/K/L = left / down / up / right).
+            // Right home HJKL: arrows, same vim order, same cluster as L3.
+            // M is the same finger as [ on L1: prefix+[ enters copy/scroll.
             // |A-1 |A-2 |A-3 |A-4 |A-5 |     |A-6 |A-7 |A-8 |A-9 |    |
-            // |    |    |    |    |    |     |    |    |    |    |    |
-            // |    |    |    |    |    |     |    |    |    |    |    |
+            // |A-S-H|A-S-J|A-S-K|A-S-L|    |     | <- |  v |  ^ | -> |    |
+            // |    |    |    |    |    |     |    |SCRL|    |    |    |
             //             | -  | -  | -  |     | -  | -  | -  |
             display-name = "NAV";
             bindings = <
                 &kp LA(N1)  &kp LA(N2)  &kp LA(N3)  &kp LA(N4)  &kp LA(N5)  &kp LA(N6)  &kp LA(N7)  &kp LA(N8)  &kp LA(N9)  &trans
-                &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans
-                &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans      &trans
+                &kp LA(LS(H)) &kp LA(LS(J)) &kp LA(LS(K)) &kp LA(LS(L)) &trans      &kp LEFT      &kp DOWN      &kp UP        &kp RIGHT     &trans
+                &trans      &trans      &trans      &trans      &trans      &trans      &tmux_scroll &trans      &trans      &trans
                                         &trans      &trans      &trans      &trans      &trans      &trans
             >;
         };
