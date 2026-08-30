@@ -218,13 +218,13 @@
             // |TAB |SCR<|MV^ |SCR>|C-T |     |BACK|C-S-TAB|C-TAB|FWD |BSPC|
             // |ESC |MV< |MVv |MV> |DEL |     | <- |   v   |  ^  | -> |RET |
             // |    |RCLK|SCR^|SCRv|C-W |     |HOME| PGDN  |PGUP |END |TABS|
-            //             | L0 | L2 |LCLK|     |sALT| L4 | -  |   L4 is HOLD only, not a tap
+            //             | L0 | L2 |LCLK|     |sGUI| L4 |sALT|   L4 is HOLD only, not a tap
             display-name = "L3";
             bindings = <
                 &kp ESC &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &kp LC(T)  &kp LA(LEFT)  &kp LC(LS(TAB))  &kp LC(TAB)  &kp LA(RIGHT)  &kp BSPC
                 &kp TAB  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &kp DEL    &kp LEFT      &kp DOWN         &kp UP       &kp RIGHT      &kp RET
                 &trans   &mkp RCLK       &msc SCRL_UP    &msc SCRL_DOWN   &kp LC(W)  &kp HOME      &kp PG_DN        &kp PG_UP    &kp END        &kp LC(LS(A))
-                                         &to L0          &to L2           &mkp LCLK  &sk RALT   &mo L4           &trans
+                                         &to L0          &to L2           &mkp LCLK  &sk LGUI   &mo L4           &sk RALT
             >;
         };
 
