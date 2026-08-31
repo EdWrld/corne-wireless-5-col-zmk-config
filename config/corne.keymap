@@ -19,7 +19,7 @@
 
 // Thumb positions 31 (left) and 34 (right) drive every layer change.
 //   base    31 = &slm L1   tap = sticky one key, hold = momentary while held
-//           34 = &slt L2   tap = sticky one key, hold 250ms = lock on
+//           34 = &slm L2   tap = sticky one key, hold = momentary while held
 //           31+34 = NAV, live while both are held — not on the ring
 //   L1-L4   31 = step out, 34 = step in, 31+34 = back to base
 //
@@ -76,6 +76,7 @@
         };
 
         // tap = &sl (layer drops after the next keycode), hold 250ms = &tog (locks on).
+        // Unused: L2 moved to &slm to match L1. Kept for a one-word revert.
         slt: sticky_layer_toggle {
             compatible = "zmk,behavior-hold-tap";
             label = "STICKY_LAYER_TOGGLE";
@@ -161,14 +162,14 @@
             // |  Q  |  W  |  E  |  R  |  T  |     |  Y  |  U  |  I  | O/- |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | '/; |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! |  /  |
-            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |   L1: tap = one key, hold = momentary
-            //                                                            L2: tap = one key, hold = lock on
+            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |   L1 and L2: tap = one key,
+            //                                                            hold = momentary while held
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &kp R        &kp T        &kp Y      &kp U       &kp I       &td MINUS O  &kp P
                 &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L        &kp SQT
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &kp FSLH
-                                      &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slt L2 L2  &kp BSPC
+                                      &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slm L2 L2  &kp BSPC
             >;
         };
 
@@ -191,18 +192,21 @@
         };
 
         layer_2 {
-            // Right hand: numpad. Left hand: clipboard, media, math operators.
-            // CUT/COPY/PSTE sit in the same columns as base X C V.
-            // |TAB |CUT |COPY|PSTE| -  |     | _ | 7 | 8 | 9 |BSPC|
-            // |ESC |PSCR|VOL-|VOL+| +  |     | = | 4 | 5 | 6 |RET |
-            // |    | *  |BRI-|BRI+|MUTE|     | 0 | 1 | 2 | 3 | .  |
+            // Top row is the number row, 1-0 straight across both hands.
+            // Right hand below it is the math block, left hand is media plus
+            // clipboard, with CUT/COPY/PSTE in the same columns as base X C V.
+            // No Esc or Enter key here - both are combos on every layer:
+            // 16+17 -> Esc, 18+19 -> Enter.
+            // | 1  | 2  | 3  | 4  | 5  |     | 6 | 7 | 8 | 9 | 0 |
+            // |TAB |VOL-|VOL+|BRI-|BRI+|     | = | - | + | _ |RET|
+            // |PSCR|CUT |COPY|PSTE|MUTE|     | / | * | ( | ) | . |
             //             |sCTL| L1 |GUI |     | SPC | L3 |sALT|
             display-name = "L2";
             bindings = <
-                &kp ESC   &kp K_CUT  &kp K_COPY    &kp K_PASTE   &kp MINUS     &kp UNDER  &kp N7     &kp N8     &kp N9     &kp BSPC
-                &kp TAB    &kp PSCRN  &kp C_VOL_DN  &kp C_VOL_UP  &kp PLUS      &kp EQUAL  &kp N4     &kp N5     &kp N6     &kp RET
-                &trans     &kp STAR   &kp C_BRI_DN  &kp C_BRI_UP  &kp C_MUTE    &kp N0     &kp N1     &kp N2     &kp N3     &kp DOT
-                                      &sk LCTRL     &to L1        &kp LGUI      &kp SPACE  &to L3     &sk RALT
+                &kp N1     &kp N2        &kp N3        &kp N4        &kp N5        &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
+                &kp TAB    &kp C_VOL_DN  &kp C_VOL_UP  &kp C_BRI_DN  &kp C_BRI_UP  &kp EQUAL  &kp MINUS  &kp PLUS   &kp UNDER  &kp RET
+                &kp PSCRN  &kp K_CUT     &kp K_COPY    &kp K_PASTE   &kp C_MUTE    &kp FSLH   &kp STAR   &kp LPAR   &kp RPAR   &kp DOT
+                                         &sk LCTRL     &to L1        &kp LGUI      &kp SPACE  &to L3     &sk RALT
             >;
         };
 
