@@ -180,13 +180,13 @@
             // |TAB| @ | # | % | $ |     | 0 | { | } | & |BSPC|
             // |ESC| " | * | ? | | |     | = | ( | ) | ; |RET |
             // | - | ! | ` | / | _ |     | < | [ | ] | > | \ |
-            //             | -  | L0 | -  |     |sALT| L2 | -  |
+            //             | -  | L0 | -  |     | SPC | L2 |sALT|
             display-name = "L1";
             bindings = <
                 &kp ESC  &kp AT     &kp HASH   &kp PRCNT  &kp DLLR        &kp AMPS   &kp N0   &kp LBRC   &kp RBRC   &kp BSPC
                 &kp TAB     &kp DQT   &kp STAR   &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp COLON   &kp SEMI
                 &kp MINUS  &kp EXCL   &kp GRAVE  &kp FSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp BSLH
-                                      &trans     &to L0     &trans        &sk RALT   &to L2     &trans
+                                      &trans     &to L0     &trans        &kp SPACE  &to L2     &sk RALT
             >;
         };
 
@@ -196,13 +196,13 @@
             // |TAB |CUT |COPY|PSTE| -  |     | _ | 7 | 8 | 9 |BSPC|
             // |ESC |PSCR|VOL-|VOL+| +  |     | = | 4 | 5 | 6 |RET |
             // |    | *  |BRI-|BRI+|MUTE|     | 0 | 1 | 2 | 3 | .  |
-            //             |sCTL| L1 |GUI |     |sALT| L3 | -  |
+            //             |sCTL| L1 |GUI |     | SPC | L3 |sALT|
             display-name = "L2";
             bindings = <
                 &kp ESC   &kp K_CUT  &kp K_COPY    &kp K_PASTE   &kp MINUS     &kp UNDER  &kp N7     &kp N8     &kp N9     &kp BSPC
                 &kp TAB    &kp PSCRN  &kp C_VOL_DN  &kp C_VOL_UP  &kp PLUS      &kp EQUAL  &kp N4     &kp N5     &kp N6     &kp RET
                 &trans     &kp STAR   &kp C_BRI_DN  &kp C_BRI_UP  &kp C_MUTE    &kp N0     &kp N1     &kp N2     &kp N3     &kp DOT
-                                      &sk LCTRL     &to L1        &kp LGUI      &sk RALT   &to L3     &trans
+                                      &sk LCTRL     &to L1        &kp LGUI      &kp SPACE  &to L3     &sk RALT
             >;
         };
 
@@ -214,13 +214,13 @@
             // |TAB |SCR<|MV^ |SCR>|C-T |     |BACK|C-S-TAB|C-TAB|FWD |BSPC|
             // |ESC |MV< |MVv |MV> |DEL |     | <- |   v   |  ^  | -> |RET |
             // |    |RCLK|SCR^|SCRv|C-W |     |HOME| PGDN  |PGUP |END |TABS|
-            //             | L0 | L2 |LCLK|     |sALT| L4 | -  |   L4 is HOLD only, not a tap
+            //             | L0 | L2 |LCLK|     | SPC | L4 |sALT|   L4 is HOLD only, not a tap
             display-name = "L3";
             bindings = <
                 &kp ESC &msc SCRL_LEFT  &mmv MOVE_UP    &msc SCRL_RIGHT  &kp LC(T)  &kp LA(LEFT)  &kp LC(LS(TAB))  &kp LC(TAB)  &kp LA(RIGHT)  &kp BSPC
                 &kp TAB  &mmv MOVE_LEFT  &mmv MOVE_DOWN  &mmv MOVE_RIGHT  &kp DEL    &kp LEFT      &kp DOWN         &kp UP       &kp RIGHT      &kp RET
                 &trans   &mkp RCLK       &msc SCRL_UP    &msc SCRL_DOWN   &kp LC(W)  &kp HOME      &kp PG_DN        &kp PG_UP    &kp END        &kp LC(LS(A))
-                                         &to L0          &to L2           &mkp LCLK  &sk RALT   &mo L4           &trans
+                                         &to L0          &to L2           &mkp LCLK  &kp SPACE  &mo L4           &sk RALT
             >;
         };
 
@@ -232,13 +232,13 @@
             // |TAB |    |    |    |BT4 |     |F1 |F2 |F3 |F4 |BSPC|
             // |ESC |BT0 |BT1 |BT2 |BT3 |     |F5 |F6 |F7 |F8 |RET |
             // |CLR |USB |BLE |RST |BOOT|     |F9 |F10|F11|F12|    |
-            //             | -  | L3 | -  |     |sALT| L0 | -  |
+            //             | -  | L3 | -  |     | SPC | L0 |sALT|
             display-name = "L4";
             bindings = <
                 &kp ESC       &trans        &trans        &trans        &bt BT_SEL 4  &kp F1     &kp F2         &kp F3         &kp F4     &kp BSPC
                 &kp TAB       &bt BT_SEL 0  &bt BT_SEL 1  &bt BT_SEL 2  &bt BT_SEL 3  &kp F5     &kp F6         &kp F7         &kp F8     &kp RET
                 &bt BT_CLR    &out OUT_USB  &out OUT_BLE  &sys_reset    &bootloader   &kp F9     &kp F10        &kp F11        &kp F12    &trans
-                                            &trans        &to L3        &trans        &sk RALT   &to L0         &trans
+                                            &trans        &to L3        &trans        &kp SPACE  &to L0         &sk RALT
             >;
         };
 
