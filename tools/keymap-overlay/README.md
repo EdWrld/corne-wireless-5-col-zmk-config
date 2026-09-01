@@ -24,8 +24,9 @@ keep in sync. Edit the keymap and the overlay redraws within a moment.
 - Under the title, how to reach the layer you are looking at — e.g.
   `hold to lock · tap for one key · left thumb` for L1, or
   `tap to switch · right thumb on L2` for L3.
-- The combos along the bottom, with the layers each one is live on
-  (`J+K → Esc`, `L+; → Enter`, both layer thumbs → base).
+- Combos drawn on the keys themselves in purple (`+K Esc` on J, `+W Tab` on Q),
+  only when that combo is live on the layer you are looking at. Hover the key
+  for the timeout and idle gate. The footer lists the same combos as a legend.
 - Hover any key for the full story, including hold-tap timings:
   `tap O · hold -  minus — td (tap-preferred, 150 ms hold)`
 
