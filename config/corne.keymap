@@ -20,12 +20,16 @@
 // Thumb positions 31 (left) and 34 (right) drive every layer change.
 //   base    31 = &slm L1   tap = sticky one key, hold = momentary while held
 //           34 = &slm L2   tap = sticky one key, hold = momentary while held
-//           31+34 = NAV, live while both are held — not on the ring
 //   L1-L4   31 = step out, 34 = step in, 31+34 = back to base
+//           on L1 the step-in and on L2 the step-out also HOLD: the hold
+//           stacks the other layer instead of replacing it, and L1+L2 up
+//           together is what the conditional layer turns into NAV.
 //
 //     L0 --34--> L1 --34--> L2 --34--> L3 ..hold 34..> L4
 //        <--31--    <--31--    <--31--
-//     L0 <── 31+34 hold ──> L5 (NAV)
+//     NAV = L1 + L2 held at once. No combo window: press either thumb,
+//     then press and hold the other whenever you like. Releasing either
+//     one drops NAV.
 //
 // L4 is the exception: hold, never tap, so the radios and bootloader cannot be
 // reached by tapping the step-in thumb one time too many.
@@ -87,6 +91,23 @@
             bindings = <&tog>, <&sl>;
         };
 
+        // tap = &to (step the ring, replacing the layer), hold = &mo (stack the
+        // layer on top of the current one). Only on L1 pos 34 and L2 pos 31, so
+        // holding gets L1 and L2 up at the same time and the conditional layer
+        // below resolves that to NAV.
+        // tap-preferred, NOT hold-preferred: after tapping to step you start
+        // typing immediately, and hold-preferred would read that next keypress
+        // as a hold and dump you in NAV instead.
+        stp: step_or_stack {
+            compatible = "zmk,behavior-hold-tap";
+            label = "STEP_OR_STACK";
+            #binding-cells = <2>;
+            tapping-term-ms = <180>;
+            quick-tap-ms = <0>;
+            flavor = "tap-preferred";
+            bindings = <&mo>, <&to>;
+        };
+
         // &td <hold> <tap>, 200ms.
         td: tapdance {
             compatible = "zmk,behavior-hold-tap";
@@ -139,17 +160,19 @@
             layers = <L1 L2 L3 L4>;
             bindings = <&to L0>;
         };
+    };
 
-        // Both layer thumbs from base -> NAV. slow-release keeps the layer
-        // up until both thumbs come up, so one lifting early does not dump
-        // you mid-hop. Not listed on combo_to_base: releasing the hold is
-        // the exit, and the same keys must not fire &to L0 while NAV is on.
-        combo_nav {
-            timeout-ms = <50>;
-            slow-release;
-            key-positions = <31 34>;
-            layers = <L0>;
-            bindings = <&mo L5>;
+    // L1 and L2 active at the same time -> NAV. Replaces the old 31+34 combo,
+    // which needed both thumbs inside a 50 ms window and gave you L1 or L2
+    // when they missed it. There is no window here at all.
+    // L5 must not be bound by anything else: ZMK hands a then-layer's on/off
+    // state entirely to this node and will switch it straight back off.
+    conditional_layers {
+        compatible = "zmk,conditional-layers";
+
+        nav {
+            if-layers = <L1 L2>;
+            then-layer = <L5>;
         };
     };
 
@@ -181,13 +204,14 @@
             // |TAB| @ | # | % | $ |     | 0 | { | } | & |BSPC|
             // |ESC| " | * | ? | | |     | = | ( | ) | ; |RET |
             // | - | ! | ` | / | _ |     | < | [ | ] | > | \ |
-            //             | -  | L0 | -  |     |sALT| L2 | -  |
+            //             | -  | L0 | -  |     |sALT| L2 | -  |   L2: tap = step in,
+            //                                                            hold = NAV
             display-name = "L1";
             bindings = <
                 &kp ESC  &kp AT     &kp HASH   &kp PRCNT  &kp DLLR        &kp AMPS   &kp N0   &kp LBRC   &kp RBRC   &kp BSPC
                 &kp TAB     &kp DQT   &kp STAR   &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp COLON   &kp SEMI
                 &kp MINUS  &kp EXCL   &kp GRAVE  &kp FSLH   &kp UNDER     &kp LT     &kp LBKT   &kp RBKT   &kp GT     &kp BSLH
-                                      &trans     &to L0     &trans        &sk RALT   &to L2     &trans
+                                      &trans     &to L0     &trans        &sk RALT   &stp L2 L2  &trans
             >;
         };
 
@@ -200,13 +224,14 @@
             // | 1  | 2  | 3  | 4  | 5  |     | 6 | 7 | 8 | 9 | 0 |
             // |TAB |VOL-|VOL+|BRI-|BRI+|     | = | - | + | _ |RET|
             // |PSCR|CUT |COPY|PSTE|MUTE|     | / | * | ( | ) | . |
-            //             |sCTL| L1 |GUI |     |sALT| L3 | -  |
+            //             |sCTL| L1 |GUI |     |sALT| L3 | -  |   L1: tap = step out,
+            //                                                            hold = NAV
             display-name = "L2";
             bindings = <
                 &kp N1     &kp N2        &kp N3        &kp N4        &kp N5        &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
                 &kp TAB    &kp C_VOL_DN  &kp C_VOL_UP  &kp C_BRI_DN  &kp C_BRI_UP  &kp EQUAL  &kp MINUS  &kp PLUS   &kp UNDER  &kp RET
                 &kp PSCRN  &kp K_CUT     &kp K_COPY    &kp K_PASTE   &kp C_MUTE    &kp FSLH   &kp STAR   &kp LPAR   &kp RPAR   &kp DOT
-                                         &sk LCTRL     &to L1        &kp LGUI      &sk RALT   &to L3     &trans
+                                         &sk LCTRL     &stp L1 L1    &kp LGUI      &sk RALT   &to L3     &trans
             >;
         };
 
@@ -247,7 +272,7 @@
         };
 
         layer_5 {
-            // Spur off base: both layer thumbs, live while held.
+            // Reached by holding L1 and L2 at once (see conditional_layers).
             // Top row: Alt+1–9 window hops.
             // Left home ASDF: tmux panes (Alt+Shift+H/J/K/L = left / down / up / right).
             // Right home HJKL: arrows, same vim order, same cluster as L3.
