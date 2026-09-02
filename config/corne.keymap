@@ -13,29 +13,15 @@
 #define L0 0   // base
 #define L1 1   // symbols
 #define L2 2   // numbers / media
-#define L3 3   // mouse + browser (toggle from NAV)
-#define L4 4   // adjust (from NAV /)
+#define L3 3   // mouse (NAV P)
+#define L4 4   // adjust (NAV /)
 #define L5 5   // NAV
 
-// Thumb positions 31 (left) and 34 (right) are L1 / L2 on base.
-//   base    31 = &slm L1   tap = sticky one key, hold = momentary while held
-//           34 = &slm L2   tap = sticky one key, hold = momentary while held
-//   L1 / L2 do not step into each other. 31+34 = back to base.
-//           L1 pos 34 tap = +, hold = &mo L2 (so L1+L2 still make NAV)
-//           L2 pos 31 tap = ,, hold = &mo L1
-//
-//     L0 --31 hold--> L1          L0 --34 hold--> L2
-//        <--31 tap--                 <--34 tap--  (those taps are &to L0)
-//     NAV (L5) is one layer, two ways in:
-//       hold L1+L2  — same conditional as before
-//       hold /      — &ns presses L1+L2 so that same conditional lights L5
-//     P on NAV toggles L3 (mouse). / on NAV is &to L4. Both are easy from
-//     L1+L2; hold-/ already uses that pinky, so they are awkward from there.
-//
-// Tab and Esc are at positions 0 and 10 on L1, L2 and L4. NAV’s top row is
-// Alt+1–9, with P as the mouse toggle.
+// Base 31/34 = L1/L2 (tap sticky, hold mo). 31+34 = base.
+// L1 34: tap +, hold mo L2. L2 31: tap comma, hold mo L1.
+// NAV = L1+L2, or hold /. P = mouse. / = L4.
 
-// Unused by any layer; kept for a future mod-tap.
+// Unused.
 &mt {
     flavor = "tap-preferred";
     tapping-term-ms = <200>;
@@ -53,7 +39,7 @@
     };
 
     behaviors {
-        // Unused. Kept so a home-row mod can be re-added in one word.
+        // Unused.
         hm: homerow_mods {
             compatible = "zmk,behavior-hold-tap";
             label = "HOMEROW_MODS";
@@ -64,10 +50,7 @@
             bindings = <&kp>, <&kp>;
         };
 
-        // tap = &sl (layer drops after the next keycode), hold = &mo (live while held).
-        // hold-preferred so the layer is live the instant another key goes down -
-        // no 250 ms dead spot before the first symbol. Safe here because both
-        // branches emit the same character; only the exit differs.
+        // tap sl, hold mo. hold-preferred.
         slm: sticky_layer_momentary {
             compatible = "zmk,behavior-hold-tap";
             label = "STICKY_LAYER_MOMENTARY";
@@ -78,8 +61,7 @@
             bindings = <&mo>, <&sl>;
         };
 
-        // tap = &sl (layer drops after the next keycode), hold 250ms = &tog (locks on).
-        // Unused: L2 moved to &slm to match L1. Kept for a one-word revert.
+        // Unused.
         slt: sticky_layer_toggle {
             compatible = "zmk,behavior-hold-tap";
             label = "STICKY_LAYER_TOGGLE";
@@ -90,8 +72,7 @@
             bindings = <&tog>, <&sl>;
         };
 
-        // Unused. Was tap = &to the other layer, hold = &mo for NAV.
-        // L1/L2 no longer step into each other; &lk replaced these.
+        // Unused.
         stp: step_or_stack {
             compatible = "zmk,behavior-hold-tap";
             label = "STEP_OR_STACK";
@@ -102,8 +83,7 @@
             bindings = <&mo>, <&to>;
         };
 
-        // &td <hold> <tap>, 200ms. quick-tap so a second press (oo, ,, ..)
-        // is always the letter, not 0 / _ / !.
+        // &td <hold> <tap>. quick-tap 200.
         td: tapdance {
             compatible = "zmk,behavior-hold-tap";
             label = "TAPDANCE";
@@ -114,9 +94,7 @@
             bindings = <&kp>, <&kp>;
         };
 
-        // Base ': tap = ', hold = ;. Idle-gated so don't / it's never
-        // become semicolon mid-word. After a pause, hold ~180 ms for ;.
-        // L1 still has a direct ; on this key for vim f/t repeat.
+        // tap ', hold ;. idle 100ms.
         qt: quote_semi {
             compatible = "zmk,behavior-hold-tap";
             label = "QUOTE_SEMI";
@@ -128,10 +106,7 @@
             bindings = <&kp>, <&kp>;
         };
 
-        // Right outer thumb: tap = BSPC, hold = Ctrl+BSPC (word delete).
-        // tap-preferred so a quick tap never eats a word. quick-tap-ms = 200
-        // so a burst of taps, or tap-then-hold, stays character delete;
-        // pause then hold is the word delete.
+        // tap BSPC, hold C-BSPC. quick-tap 200.
         wb: word_backspace {
             compatible = "zmk,behavior-hold-tap";
             label = "WORD_BACKSPACE";
@@ -142,10 +117,7 @@
             bindings = <&kp>, <&kp>;
         };
 
-        // Base / : tap = /, hold = NAV. tap-preferred so /foo is still
-        // search; hold-preferred would eat the first letter of the query.
-        // quick-tap-ms so // (search-previous) cannot start a hold.
-        // Hold side is nav_hold (one unused param, hence &ns 0 FSLH).
+        // tap /, hold NAV. &ns 0 FSLH (dummy param).
         ns: nav_slash {
             compatible = "zmk,behavior-hold-tap";
             label = "NAV_SLASH";
@@ -156,9 +128,7 @@
             bindings = <&nav_hold>, <&kp>;
         };
 
-        // L1 pos 34 / L2 pos 31: tap = a real key, hold = &mo the other
-        // layer so two-thumb NAV from base still stacks L1+L2.
-        // hold-preferred: NAV is live the instant the next key goes down.
+        // tap key, hold mo. hold-preferred.
         lk: layer_key {
             compatible = "zmk,behavior-hold-tap";
             label = "LAYER_KEY";
@@ -171,8 +141,7 @@
     };
 
     macros {
-        // prefix (Ctrl+Space) then [ — tmux copy/scroll mode. wait/tap 40 ms
-        // so the host sees two distinct reports, not a mashed chord.
+        // prefix+[
         tmux_scroll: tmux_scroll {
             compatible = "zmk,behavior-macro";
             label = "TMUX_SCROLL";
@@ -182,6 +151,7 @@
             bindings = <&kp LC(SPACE) &kp LBKT>;
         };
 
+        // prefix+z
         tmux_zoom: tmux_zoom {
             compatible = "zmk,behavior-macro";
             label = "TMUX_ZOOM";
@@ -191,6 +161,7 @@
             bindings = <&kp LC(SPACE) &kp Z>;
         };
 
+        // prefix+c
         tmux_new: tmux_new {
             compatible = "zmk,behavior-macro";
             label = "TMUX_NEW";
@@ -200,9 +171,7 @@
             bindings = <&kp LC(SPACE) &kp C>;
         };
 
-        // Hold L1 and L2 for the duration of the key. The conditional
-        // layer turns that into NAV. One unused param so it can sit on
-        // the hold side of &ns (hold-tap always forwards two cells).
+        // Hold L1+L2 (feeds the NAV conditional). Dummy param for &ns.
         nav_hold: nav_hold {
             compatible = "zmk,behavior-macro-one-param";
             label = "NAV_HOLD";
@@ -219,7 +188,7 @@
     combos {
         compatible = "zmk,combos";
 
-        // Positions 16+17 (J+K on base) -> Esc, every layer.
+        // J+K Esc. idle 100ms.
         combo_esc {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
@@ -227,37 +196,28 @@
             bindings = <&kp ESC>;
         };
 
-        // Positions 18+19 (L+' on base) -> Enter, every layer. No
-        // require-prior-idle here: it needs to fire immediately after a
-        // letter, which is the :w<CR> rhythm.
+        // L+' Enter.
         combo_ret {
             timeout-ms = <50>;
             key-positions = <18 19>;
             bindings = <&kp RET>;
         };
 
-        // Positions 0+1 (Q+W on base) -> Tab, every layer. No idle
-        // gate: nvim completion is a letter then Tab with no pause.
+        // Q+W Tab.
         combo_tab {
             timeout-ms = <50>;
             key-positions = <0 1>;
             bindings = <&kp TAB>;
         };
 
-        // Positions 12+17 (D+K on base) -> colon, every layer. No idle
-        // gate: the :w rhythm is Esc (J+K) then colon immediately.
-        // Opposite middles, so it is not an English roll.
+        // D+K colon.
         combo_col {
             timeout-ms = <50>;
             key-positions = <12 17>;
             bindings = <&kp COLON>;
         };
 
-        // Copy / paste as opposite-index combos so they cannot be mixed up
-        // the way thumb-Ctrl + C/V can (those two keys sit next to each
-        // other on the same hand as the Ctrl thumb). Same consumer keys
-        // as L2. Idle gate so rolls never fire them.
-        // F+H (both home-row indexes) -> copy.
+        // F+H copy. idle 100ms.
         combo_copy {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
@@ -265,7 +225,7 @@
             bindings = <&kp K_COPY>;
         };
 
-        // V+N (both bottom-row indexes) -> paste.
+        // V+N paste. idle 100ms.
         combo_paste {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
@@ -273,7 +233,7 @@
             bindings = <&kp K_PASTE>;
         };
 
-        // Both layer thumbs -> base. Off L0, so the base thumbs are unaffected.
+        // Both layer thumbs -> base. L1-L4.
         combo_to_base {
             timeout-ms = <50>;
             key-positions = <31 34>;
@@ -282,11 +242,7 @@
         };
     };
 
-    // L1 and L2 active at the same time -> NAV. Replaces the old 31+34 combo,
-    // which needed both thumbs inside a 50 ms window and gave you L1 or L2
-    // when they missed it. There is no window here at all.
-    // L5 must not be bound by anything else: ZMK hands a then-layer's on/off
-    // state entirely to this node and will switch it straight back off.
+    // L1+L2 -> NAV. Do not &mo L5.
     conditional_layers {
         compatible = "zmk,conditional-layers";
 
@@ -299,17 +255,12 @@
     keymap {
         compatible = "zmk,keymap";
         layer_0 {
-            // x/y = tap x, hold y.  s = sticky.
-            // Delete and Tab are not on base; Tab is at position 0 on every other
-            // layer. Esc is J+K, Enter is L+', Tab is Q+W, colon is D+K,
-            // copy is F+H, paste is V+N.
-            // Hold O/R are the vim line motions (0 / $). Minus left O; it
-            // is still a direct key on L1 and on L2's math block.
+            // x/y = tap/hold. s = sticky.
+            // Esc J+K, Enter L+', Tab Q+W, colon D+K, copy F+H, paste V+N.
             // |  Q  |  W  |  E  |  R/$ |  T  |     |  Y  |  U  |  I  | O/0 |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | '/; |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! | /NAV|
-            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC/C-BSPC |   L1 and L2: tap = one key,
-            //                                                                 hold = momentary while held
+            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC/C-BSPC |
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &td DLLR R   &kp T        &kp Y      &kp U       &kp I       &td N0 O     &kp P
@@ -320,19 +271,10 @@
         };
 
         layer_1 {
-            // Every symbol is direct; no Shift needed.
-            // + is the right layer thumb (tap); hold that thumb still stacks
-            // L2 so two-thumb NAV from base works. _ is hold-comma on base
-            // and a direct key on L2. 0 left for *: hold-O is 0, and L2's
-            // number row still has it. * is also on L2's math block.
-            // < > sit on the left home row (old " and ^). [] shifted one
-            // column right onto , and .; " and ^ took the vacated bottom
-            // cells. {} and [] share the middle/ring columns; () stay on
-            // index/middle.
             // |ESC| @ | # | % | $ |     | & | * | { | } | -  |
             // |TAB| < | > | ? | | |     | = | ( | ) | : | ;  |
             // | - | ! | ` | / | ~ |     | " | ^ | [ | ] | \ |
-            //             | -  | L0 | -  |     |sALT| +  | -  |   +: tap = +, hold = NAV stack
+            //             | -  | L0 | -  |     |sALT| +  | -  |   + hold = mo L2
             display-name = "L1";
             bindings = <
                 &kp ESC  &kp AT     &kp HASH   &kp PRCNT  &kp DLLR        &kp AMPS   &kp STAR  &kp LBRC   &kp RBRC   &kp MINUS
@@ -343,17 +285,10 @@
         };
 
         layer_2 {
-            // Top row is the number row, 1-0 straight across both hands.
-            // Right hand below it is the math block, left hand is media plus
-            // clipboard, with CUT/COPY/PSTE in the same columns as base X C V.
-            // No Esc or Enter key here - both are combos on every layer:
-            // 16+17 -> Esc, 18+19 -> Enter.
             // | 1  | 2  | 3  | 4  | 5  |     | 6 | 7 | 8 | 9 | 0 |
             // |TAB |VOL-|VOL+|BRI-|BRI+|     | = | - | + | _ |RET|
             // |PSCR|CUT |COPY|PSTE|MUTE|     | / | * | ( | ) | . |
-            //             |sCTL| ,  |GUI |     |sALT| L0 | -  |   ,: tap = comma, hold = NAV stack
-            // Right thumb goes home. Mouse and L4 are NAV-only. L1 is not
-            // reachable from here; comma is the thousands separator.
+            //             |sCTL| ,  |GUI |     |sALT| L0 | -  |   , hold = mo L1
             display-name = "L2";
             bindings = <
                 &kp N1     &kp N2        &kp N3        &kp N4        &kp N5        &kp N6     &kp N7     &kp N8     &kp N9     &kp N0
@@ -364,16 +299,7 @@
         };
 
         layer_3 {
-            // Mouse + browser. Toggle on and off from NAV's P only. Not on
-            // the thumb ring. NAV is a higher layer, so that P is reachable
-            // even while mouse is locked.
-            // Left hand is the pointer cluster; the inner-index column keeps
-            // the old L3 browser keys (C-T / DEL / C-W). Right hand is the
-            // rest of old L3 (tabs, arrows, home/end). Other thumbs fall
-            // through so space and the layer keys still work while locked.
-            // BACK/FWD  = Alt+Left / Alt+Right, sitting right above the arrows
-            // C-S-TAB / C-TAB = previous / next tab      TABS = Ctrl+Shift+A
-            // C-T / C-W = new tab / close tab, same column: top opens, bottom closes.
+            // Toggle from NAV P. BACK/FWD = A-Left/Right. TABS = C-S-A.
             // |ESC |SCR<|MV^ |SCR>|C-T |     |BACK|C-S-TAB|C-TAB|FWD |BSPC|
             // |TAB |MV< |MVv |MV> |DEL |     | <- |   v   |  ^  | -> |RET |
             // |    |RCLK|SCR^|SCRv|C-W |     |HOME| PGDN  |PGUP |END |TABS|
@@ -388,10 +314,7 @@
         };
 
         layer_4 {
-            // Reached only by tapping / on NAV (&to L4). Off the thumb ring,
-            // so walking L0 → L1 → L2 can never land you on the radios or
-            // the bootloader. Blank cells fall through to base. Thumbs go
-            // home; there is no path to the mouse layer from here.
+            // NAV / only. trans falls through.
             // |TAB |    |    |    |BT4 |     |F1 |F2 |F3 |F4 |BSPC|
             // |ESC |BT0 |BT1 |BT2 |BT3 |     |F5 |F6 |F7 |F8 |RET |
             // |CLR |USB |BLE |RST |BOOT|     |F9 |F10|F11|F12|    |
@@ -406,14 +329,7 @@
         };
 
         layer_5 {
-            // Same layer for both entries (L1+L2, or hold /).
-            // Top: Alt+1–9 window hops. P toggles mouse (L3). / is &to L4.
-            // Left home ASDF: arrows. Right home HJKL: tmux panes
-            // (Alt+Shift+H/J/K/L = left / down / up / right).
-            // Left bottom ZXCV: sticky GUI / Alt / Shift / Ctrl.
-            // M is prefix+[ copy/scroll. Thumbs 32 and 35 are open.
-            // 31/34 are New / prev-tab when / is held; they stay L1/L2
-            // when those thumbs are how you got here.
+            // L1+L2 or hold /. ASDF arrows, HJKL tmux panes, P mouse, / L4.
             // |A-1 |A-2 |A-3 |A-4 |A-5 |     |A-6 |A-7 |A-8 |A-9 |MOUSE|
             // | <- |  v |  ^ | -> |    |     |pane←|pane↓|pane↑|pane→|    |
             // |sGUI|sALT|sSFT|sCTL|    |     |    |SCRL|    |    | L4 |
