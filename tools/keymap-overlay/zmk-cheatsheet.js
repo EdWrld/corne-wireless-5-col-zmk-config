@@ -166,6 +166,7 @@ function parseKeymap(src) {
                     binding: splitBindings(p['bindings'])[0] || '',
                     layers: splitCells(p['layers']),
                     timeout: (p['timeout-ms'] || '').replace(/[<>]/g, ''),
+                    priorIdle: (p['require-prior-idle-ms'] || '').replace(/[<>]/g, ''),
                 });
             }
             break;
@@ -484,6 +485,42 @@ function comboScope(model, combo) {
     return 'on ' + combo.layers.map(l => layerLabel(model, l)).join(', ');
 }
 
+function comboLayerIndex(model, ref) {
+    if (model.defines[ref] !== undefined) return model.defines[ref];
+    const n = parseInt(ref, 10);
+    return isNaN(n) ? -1 : n;
+}
+
+function comboLiveOnLayer(model, combo, layerIdx) {
+    if (!combo.layers || !combo.layers.length) return true;
+    return combo.layers.some(ref => comboLayerIndex(model, ref) === layerIdx);
+}
+
+function combosAt(model, layerIdx, pos) {
+    return model.combos.filter(c =>
+        comboLiveOnLayer(model, c, layerIdx) && c.positions.includes(pos));
+}
+
+// Partner names always come from base, so Q+W stays Q+W on L1 (where
+// those keys are Esc and @).
+function comboPartnerLabel(model, combo, pos) {
+    return combo.positions.filter(p => p !== pos)
+        .map(p => keyLabelAt(model, 0, p)).join('+');
+}
+
+function comboLine(model, combo, pos) {
+    const result = resolve(model, combo.binding);
+    return `+${comboPartnerLabel(model, combo, pos)} ${result.tap || result.detail}`;
+}
+
+function comboDetail(model, combo, pos) {
+    const result = resolve(model, combo.binding);
+    const partners = combo.positions.filter(p => p !== pos)
+        .map(p => keyLabelAt(model, 0, p)).join(' + ');
+    const idle = combo.priorIdle ? `, idle ${combo.priorIdle} ms` : '';
+    return `combo with ${partners} ${ch('arrow')} ${result.detail} (${combo.timeout || '?'} ms, ${comboScope(model, combo)}${idle})`;
+}
+
 function keyLabelAt(model, layerIdx, pos) {
     const layer = model.layers[layerIdx];
     if (!layer || !layer.keys[pos]) return `#${pos}`;
@@ -560,7 +597,7 @@ function dump(model) {
  * Styling
  * ------------------------------------------------------------------ */
 
-const LAYER_ACCENT = ['#7cc2ff', '#a9e34b', '#ffb454', '#ff8fa3', '#c9a0ff', '#5ad1c4'];
+const LAYER_ACCENT = ['#7cc2ff', '#a9e34b', '#ffb454', '#ff8fa3', '#c9a0ff', '#5ad1c4', '#f0c674'];
 
 function buildCss(scale) {
     const px = n => Math.round(n * scale);
@@ -628,6 +665,8 @@ function buildCss(scale) {
     .key.macro .tap { color: #a9e34b; font-size: ${px(10)}px; }
     .key.macro .hold { color: #a9e34b; }
     .key.sys .tap { color: #ff8fa3; font-size: ${px(11)}px; }
+    .key.has-combo { border-color: #5c4d78; }
+    .combo { color: #c9a0ff; font-size: ${px(8)}px; }
 
     #hover { color: #b9c0d4; font-size: ${px(10)}px; }
     #combos { color: #666d80; font-size: ${px(10)}px; }
@@ -874,12 +913,12 @@ const Overlay = class Overlay {
             col.set_margin_top(px(STAGGER[c]));
             col.set_valign(Gtk.Align.START);
             for (let r = 0; r < ROWS; r++)
-                col.pack_start(this.makeKey(layer.keys[r * COLS + c], px), false, false, 0);
+                col.pack_start(this.makeKey(layer.keys[r * COLS + c], r * COLS + c, px), false, false, 0);
             halves[c < 5 ? 0 : 1].cols.pack_start(col, false, false, 0);
         }
 
         for (let t = 0; t < THUMBS; t++) {
-            const key = this.makeKey(layer.keys[ROWS * COLS + t], px);
+            const key = this.makeKey(layer.keys[ROWS * COLS + t], ROWS * COLS + t, px);
             key.set_margin_top(px(THUMB_STAGGER[t]));
             key.set_valign(Gtk.Align.START);
             halves[t < 3 ? 0 : 1].thumbs.pack_start(key, false, false, 0);
@@ -888,13 +927,15 @@ const Overlay = class Overlay {
         return board;
     }
 
-    makeKey(binding, px) {
+    makeKey(binding, pos, px) {
         const info = resolve(this.model, binding || 'none');
+        const combos = combosAt(this.model, this.state.layer, pos);
         // The style classes live on the EventBox so that :hover actually fires.
         const ev = new Gtk.EventBox({ visible_window: true });
         const ctx = ev.get_style_context();
         ctx.add_class('key');
         if (info.kind !== 'key' && info.kind !== 'holdtap') ctx.add_class(info.kind);
+        if (combos.length) ctx.add_class('has-combo');
         ev.set_size_request(px(46), px(46));
         const box = new Gtk.Box({ orientation: Gtk.Orientation.VERTICAL, spacing: 0 });
 
@@ -909,11 +950,21 @@ const Overlay = class Overlay {
 
         box.pack_start(hold, false, false, px(2));
         box.pack_start(tap, true, true, 0);
+        for (const combo of combos) {
+            const line = new Gtk.Label({ label: comboLine(this.model, combo, pos) });
+            line.get_style_context().add_class('combo');
+            line.set_ellipsize(3);
+            line.set_max_width_chars(8);
+            box.pack_start(line, false, false, 0);
+        }
         ev.add(box);
 
-        ev.set_tooltip_text(info.detail);
+        const extra = combos.map(c => comboDetail(this.model, c, pos));
+        const tip = [info.detail, ...extra].join('\n');
+        const hover = [info.detail, ...extra].join(`  ${ch('dot')}  `);
+        ev.set_tooltip_text(tip);
         ev.add_events(Gdk.EventMask.ENTER_NOTIFY_MASK | Gdk.EventMask.LEAVE_NOTIFY_MASK);
-        ev.connect('enter-notify-event', () => { this.setHover(info.detail); return false; });
+        ev.connect('enter-notify-event', () => { this.setHover(hover); return false; });
         ev.connect('leave-notify-event', () => { this.setHover(null); return false; });
         return ev;
     }
@@ -930,6 +981,7 @@ const Overlay = class Overlay {
 
         const bits = [];
         for (const combo of this.model.combos) {
+            if (!comboLiveOnLayer(this.model, combo, this.state.layer)) continue;
             const keys = combo.positions.map(p => keyLabelAt(this.model, 0, p)).join('+');
             bits.push(`${keys} ${ch('arrow')} ${resolve(this.model, combo.binding).tap}`);
         }
@@ -1011,26 +1063,34 @@ function esc(text) {
         .replace(/"/g, '&quot;');
 }
 
-function htmlKey(model, binding) {
+function htmlKey(model, binding, layerIdx, pos) {
     const info = resolve(model, binding || 'none');
+    const combos = combosAt(model, layerIdx, pos);
     const cls = ['key'];
     if (info.kind !== 'key' && info.kind !== 'holdtap') cls.push(info.kind);
-    return `<div class="${cls.join(' ')}" title="${esc(info.detail)}">`
+    if (combos.length) cls.push('has-combo');
+    const title = [info.detail, ...combos.map(c => comboDetail(model, c, pos))].join(' — ');
+    const comboHtml = combos.map(c =>
+        `<span class="combo">${esc(comboLine(model, c, pos))}</span>`).join('');
+    return `<div class="${cls.join(' ')}" title="${esc(title)}">`
         + `<span class="hold">${esc(info.hold || ' ')}</span>`
-        + `<span class="tap">${esc(info.tap || ' ')}</span></div>`;
+        + `<span class="tap">${esc(info.tap || ' ')}</span>`
+        + comboHtml
+        + `</div>`;
 }
 
-function htmlBoard(model, layer) {
+function htmlBoard(model, layer, layerIdx) {
     const halves = [[], []];
     for (let c = 0; c < COLS; c++) {
         const keys = [];
-        for (let r = 0; r < ROWS; r++) keys.push(htmlKey(model, layer.keys[r * COLS + c]));
+        for (let r = 0; r < ROWS; r++)
+            keys.push(htmlKey(model, layer.keys[r * COLS + c], layerIdx, r * COLS + c));
         halves[c < 5 ? 0 : 1].push(`<div class="col" style="margin-top:${STAGGER[c]}px">${keys.join('')}</div>`);
     }
     const thumbs = [[], []];
     for (let t = 0; t < THUMBS; t++) {
         thumbs[t < 3 ? 0 : 1].push(
-            `<div style="margin-top:${THUMB_STAGGER[t]}px">${htmlKey(model, layer.keys[ROWS * COLS + t])}</div>`);
+            `<div style="margin-top:${THUMB_STAGGER[t]}px">${htmlKey(model, layer.keys[ROWS * COLS + t], layerIdx, ROWS * COLS + t)}</div>`);
     }
     return `<div class="board">
       <div class="half"><div class="cols">${halves[0].join('')}</div>
@@ -1045,7 +1105,7 @@ function exportHtml(model, outPath, sourcePath) {
     <section>
       <h2><span class="swatch" style="background:${LAYER_ACCENT[i % LAYER_ACCENT.length]}"></span>
         ${esc(layer.display)}<small>${esc(accessHint(model, i))}</small></h2>
-      ${htmlBoard(model, layer)}
+      ${htmlBoard(model, layer, i)}
     </section>`).join('\n');
 
     const extras = [];
@@ -1080,12 +1140,14 @@ function exportHtml(model, outPath, sourcePath) {
   .col { display: flex; flex-direction: column; gap: 4px; }
   .thumbs { display: flex; gap: 4px; align-items: flex-start; }
   .thumbs.left { justify-content: flex-end; }
-  .key { width: 46px; height: 46px; border-radius: 8px; background: #1b1e28;
+  .key { width: 46px; min-height: 46px; border-radius: 8px; background: #1b1e28;
          border: 1px solid #2b3040; display: flex; flex-direction: column;
-         align-items: center; justify-content: center; }
+         align-items: center; justify-content: center; padding: 2px 0; }
   .key:hover { border-color: #4d566e; background: #232735; }
   .key .hold { font-size: 9px; line-height: 11px; color: #7cc2ff; min-height: 11px; }
   .key .tap { font-size: 14px; font-weight: 700; line-height: 18px; }
+  .key.has-combo { border-color: #5c4d78; }
+  .key .combo { font-size: 8px; line-height: 10px; color: #c9a0ff; }
   .key.trans { background: rgba(255,255,255,.015); border-color: #23262f; }
   .key.trans .tap { color: #3b4152; font-size: 11px; }
   .key.mod .tap { color: #98a0b5; font-size: 11px; }
