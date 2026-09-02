@@ -36,16 +36,18 @@ ring.
 
 Plain US QWERTY. No home-row mods. Thumb mods are sticky and can be held.
 
+```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │   Q   │   W   │   E   │  R/$  │   T   │   │   Y   │   U   │   I   │  O/0  │   P   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │   A   │   S   │   D   │   F   │   G   │   │   H   │   J   │   K   │   L   │  '/;  │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   Z   │   X   │   C   │   V   │   B   │   │   N   │   M   │  ,/_  │  ./!  │ /NAV  │
+│   Z   │   X   │   C   │   V   │   B   │   │   N   │   M   │  ,/_  │  ./!  │ / NAV │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │ sCtrl │  L1   │  s⇧   │   │   ␣   │  L2   │ ⌫/C⌫  │
+                │ sCtrl │  L1   │  sSft │   │  Spc  │  L2   │ Bk/C⌫ │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
+```
 
 `s` = sticky. `x/y` = tap `x`, hold `y`. `R` held is `$`, `O` held is `0`,
 `'` held is `;` (idle-gated), comma held is `_`, dot held is `!`, `/` held
@@ -58,16 +60,18 @@ Combos: **Q+W** Tab, **J+K** Esc, **L+'** Enter, **D+K** colon, **F+H** copy,
 
 ## L1 — Symbols
 
+```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │  Esc  │   @   │   #   │   %   │   $   │   │   &   │   *   │   {   │   }   │   -   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ⇥   │   <   │   >   │   ?   │   |   │   │   =   │   (   │   )   │   :   │   ;   │
+│  Tab  │   <   │   >   │   ?   │   |   │   │   =   │   (   │   )   │   :   │   ;   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │   -   │   !   │   `   │   /   │   ~   │   │   "   │   ^   │   [   │   ]   │   \   │
-╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────╯
+╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │   ·   │  L0   │   ·   │   │   ␣   │  +   │ sAltGr│
+                │       │  L0   │       │   │  Spc  │   +   │ sAltG │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
+```
 
 `+` on the right layer thumb: tap `+`, hold stacks L2 for NAV.
 
@@ -78,16 +82,18 @@ Combos: **Q+W** Tab, **J+K** Esc, **L+'** Enter, **D+K** colon, **F+H** copy,
 Top row is `1`–`0`. Right hand below that is math; left is media and
 clipboard on the same columns as base `X C V`.
 
+```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
 │   1   │   2   │   3   │   4   │   5   │   │   6   │   7   │   8   │   9   │   0   │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ⇥   │  Vol- │  Vol+ │  Bri- │  Bri+ │   │   =   │   -   │   +   │   _   │   ⏎   │
+│  Tab  │  Vol- │  Vol+ │  Bri- │  Bri+ │   │   =   │   -   │   +   │   _   │  Ret  │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
 │ PrtSc │  Cut  │  Copy │  Pste │  Mute │   │   /   │   *   │   (   │   )   │   .   │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │ sCtrl │   ,   │ Super │   │   ␣   │  L0   │ sAltGr│
+                │ sCtrl │   ,   │ Super │   │  Spc  │  L0   │ sAltG │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
+```
 
 `,` on the left layer thumb: tap comma, hold stacks L1 for NAV. Clipboard
 keys send HID Cut/Copy/Paste, not Ctrl+X/C/V.
@@ -99,21 +105,23 @@ keys send HID Cut/Copy/Paste, not Ctrl+X/C/V.
 Toggle from **P on NAV**. Left hand is the pointer; right hand is arrows and
 browser. Thumbs fall through (Space and Backspace still work).
 
+```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
-│  Esc  │  Scr← │  Mv↑  │  Scr→ │  C-T  │   │  A-←  │ C-S-⇥ │  C-⇥  │  A-→  │   ⌫   │
+│  Esc  │  Scr< │  Mv^  │  Scr> │  C-T  │   │  A-<  │ CSTab │  CTab │  A->  │  Bksp │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ⇥   │  Mv←  │  Mv↓  │  Mv→  │   ⌦   │   │   ←   │   ↓   │   ↑   │   →   │   ⏎   │
+│  Tab  │  Mv<  │  Mv v │  Mv>  │  Del  │   │   <   │   v   │   ^   │   >   │  Ret  │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ·   │  RClk │  Scr↑ │  Scr↓ │  C-W  │   │  Home │  PgDn │  PgUp │  End  │ C-S-A │
-╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────╯
+│       │  RClk │  Scr^ │  Scrv │  C-W  │   │  Home │  PgDn │  PgUp │  End  │ C-S-A │
+╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │   ·   │   ·   │  LClk │   │   ·   │   ·   │   ·   │
+                │       │       │  LClk │   │       │       │       │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
+```
 
 | Key | Sends | Does |
 | --- | --- | --- |
-| `A-←` `A-→` | Alt+Left / Alt+Right | Back / Forward |
-| `C-S-⇥` `C-⇥` | Ctrl+Shift+Tab / Ctrl+Tab | previous / next tab |
+| `A-<` `A->` | Alt+Left / Alt+Right | Back / Forward |
+| `C-S-T` `C-T` | Ctrl+Shift+Tab / Ctrl+Tab | previous / next tab |
 | `C-S-A` | Ctrl+Shift+A | Chrome tab search (Firefox: Add-ons) |
 | `C-T` `C-W` | Ctrl+T / Ctrl+W | new tab / close tab |
 
@@ -126,16 +134,18 @@ mouse is ignored over Bluetooth (`BTclr` on L4).
 
 Radios, output, reset, F-row. **NAV `/` only** — not on the thumb ring.
 
+```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
-│  Esc  │   ·   │   ·   │   ·   │  BT4  │   │   F1  │   F2  │   F3  │   F4  │   ⌫   │
+│  Esc  │       │       │       │  BT4  │   │   F1  │   F2  │   F3  │   F4  │  Bksp │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ⇥   │  BT0  │  BT1  │  BT2  │  BT3  │   │   F5  │   F6  │   F7  │   F8  │   ⏎   │
+│  Tab  │  BT0  │  BT1  │  BT2  │  BT3  │   │   F5  │   F6  │   F7  │   F8  │  Ret  │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│ BTclr │  USB  │  BLE  │ Reset │  Boot │   │   F9  │  F10  │  F11  │  F12  │   ·   │
-╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────╯
+│ BTclr │  USB  │  BLE  │ Reset │  Boot │   │   F9  │  F10  │  F11  │  F12  │       │
+╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │   ·   │  L0   │   ·   │   │   ␣   │  L0   │ sAltGr│
+                │       │  L0   │       │   │  Spc  │  L0   │ sAltG │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
+```
 
 ---
 
@@ -151,16 +161,18 @@ Thumbs: zoom (`prefix+z`), new window (`prefix+c`), next tab, prev tab. The
 two layer thumbs are new-window / prev-tab only if you entered with `/`
 (they stay L1/L2 if that is how you got here).
 
+```
 ╭───────┬───────┬───────┬───────┬───────╮   ╭───────┬───────┬───────┬───────┬───────╮
-│  A-1  │  A-2  │  A-3  │  A-4  │  A-5  │   │  A-6  │  A-7  │  A-8  │  A-9  │ MOUSE │
+│  A-1  │  A-2  │  A-3  │  A-4  │  A-5  │   │  A-6  │  A-7  │  A-8  │  A-9  │ Mouse │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│   ←   │   ↓   │   ↑   │   →   │   ·   │   │ pane← │ pane↓ │ pane↑ │ pane→ │   ·   │
+│   <   │   v   │   ^   │   >   │       │   │  tm<  │  tm v │  tm^  │  tm>  │       │
 ├───────┼───────┼───────┼───────┼───────┤   ├───────┼───────┼───────┼───────┼───────┤
-│ sGUI  │ sAlt  │  s⇧   │ sCtrl │   ·   │   │   ·   │ scrl  │   ·   │   ·   │  L4   │
-╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────╯
+│ sGUI  │ sAlt  │ sSft  │ sCtrl │       │   │       │ scrl  │       │       │  L4   │
+╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │ zoom  │  new  │   ·   │   │  Tab> │  Tab< │   ·   │
+                │ zoom  │  new  │       │   │  Tab> │  Tab< │       │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
+```
 
 ---
 
@@ -186,13 +198,13 @@ have no idle gate (`:w` then Enter, completion Tab).
 | Behaviour | Used on | Flavor | Term | Notes |
 | --- | --- | --- | --- | --- |
 | `slm` | base L1/L2 thumbs | hold-preferred | 250 ms | mo hold, sl tap |
-| `td` | R, O, `,`, `.` | tap-preferred | 200 ms | `$` `0` `_` `!` on hold; quick-tap 200 |
-| `qt` | `'` | tap-preferred | 180 ms | `;` on hold; idle 100 ms |
+| `td` | R, O, comma, dot | tap-preferred | 200 ms | `$` `0` `_` `!` on hold; quick-tap 200 |
+| `qt` | quote | tap-preferred | 180 ms | `;` on hold; idle 100 ms |
 | `wb` | Backspace | tap-preferred | 200 ms | Ctrl+Backspace on hold |
 | `ns` | `/` | tap-preferred | 200 ms | hold = NAV (macro L1+L2) |
-| `lk` | L1 `+`, L2 `,` | hold-preferred | 250 ms | hold stacks the other layer |
-| `hm` `slt` `stp` `&mt` | unused | | | |
-| `&mmv` | mouse | — | 680 ms to max | |
+| `lk` | L1 `+`, L2 comma | hold-preferred | 250 ms | hold stacks the other layer |
+| unused | `hm` `slt` `stp` `&mt` | — | — | — |
+| `&mmv` | mouse | — | 680 ms to max | — |
 
 Do not `&mo` L5; the conditional layer owns it.
 
