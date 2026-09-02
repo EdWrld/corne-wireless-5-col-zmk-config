@@ -45,16 +45,16 @@ Plain US QWERTY. No home-row mods. Thumb mods are sticky and can be held.
 │   Z   │   X   │   C   │   V   │   B   │   │   N   │   M   │  ,/_  │  ./!  │ / NAV │
 ╰───────┴───────┴───────┴───────┴───────╯   ╰───────┴───────┴───────┴───────┴───────╯
                 ╭───────┬───────┬───────╮   ╭───────┬───────┬───────╮
-                │ sCtrl │  L1   │  sSft │   │  Spc  │  L2   │ Bk/C⌫ │
+                │ sCtrl │  L1   │  sSft │   │  Spc  │  L2   │  Bksp │
                 ╰───────┴───────┴───────╯   ╰───────┴───────┴───────╯
 ```
 
 `s` = sticky. `x/y` = tap `x`, hold `y`. `R` held is `$`, `O` held is `0`,
 `'` held is `;` (idle-gated), comma held is `_`, dot held is `!`, `/` held
-is NAV. Backspace held is Ctrl+Backspace.
+is NAV.
 
-Combos: **Q+W** Tab, **J+K** Esc, **L+'** Enter, **D+K** colon, **F+H** copy,
-**V+N** paste.
+Combos: **Q+W** Tab, **J+K** Esc, **L+'** Enter, **K+L** colon, **D+F** copy,
+**C+V** paste. Same-hand only — none of these cross the split.
 
 ---
 
@@ -183,9 +183,9 @@ two layer thumbs are new-window / prev-tab only if you entered with `/`
 | Q+W | Tab | 50 ms | every layer |
 | J+K | Esc | 50 ms, idle 100 ms | every layer |
 | L+' | Enter | 50 ms | every layer |
-| D+K | colon | 50 ms | every layer |
-| F+H | Copy | 50 ms, idle 100 ms | every layer |
-| V+N | Paste | 50 ms, idle 100 ms | every layer |
+| K+L | colon | 50 ms | every layer |
+| D+F | Copy | 50 ms, idle 100 ms | every layer |
+| C+V | Paste | 50 ms, idle 100 ms | every layer |
 | both layer thumbs | base | 50 ms | L1–L4 |
 
 Esc/copy/paste will not fire within 100 ms of another key. Enter/Tab/colon
@@ -200,7 +200,6 @@ have no idle gate (`:w` then Enter, completion Tab).
 | `slm` | base L1/L2 thumbs | hold-preferred | 250 ms | mo hold, sl tap |
 | `td` | R, O, comma, dot | tap-preferred | 200 ms | `$` `0` `_` `!` on hold; quick-tap 200 |
 | `qt` | quote | tap-preferred | 180 ms | `;` on hold; idle 100 ms |
-| `wb` | Backspace | tap-preferred | 200 ms | Ctrl+Backspace on hold |
 | `ns` | `/` | tap-preferred | 200 ms | hold = NAV (macro L1+L2) |
 | `lk` | L1 `+`, L2 comma | hold-preferred | 250 ms | hold stacks the other layer |
 | unused | `hm` `slt` `stp` `&mt` | — | — | — |

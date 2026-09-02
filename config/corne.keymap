@@ -106,17 +106,6 @@
             bindings = <&kp>, <&kp>;
         };
 
-        // tap BSPC, hold C-BSPC. quick-tap 200.
-        wb: word_backspace {
-            compatible = "zmk,behavior-hold-tap";
-            label = "WORD_BACKSPACE";
-            #binding-cells = <2>;
-            tapping-term-ms = <200>;
-            quick-tap-ms = <200>;
-            flavor = "tap-preferred";
-            bindings = <&kp>, <&kp>;
-        };
-
         // tap /, hold NAV. &ns 0 FSLH (dummy param).
         ns: nav_slash {
             compatible = "zmk,behavior-hold-tap";
@@ -210,26 +199,26 @@
             bindings = <&kp TAB>;
         };
 
-        // D+K colon.
+        // K+L colon. right hand, next to Esc and Enter.
         combo_col {
             timeout-ms = <50>;
-            key-positions = <12 17>;
+            key-positions = <17 18>;
             bindings = <&kp COLON>;
         };
 
-        // F+H copy. idle 100ms.
+        // D+F copy. left home row. idle 100ms.
         combo_copy {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
-            key-positions = <13 15>;
+            key-positions = <12 13>;
             bindings = <&kp K_COPY>;
         };
 
-        // V+N paste. idle 100ms.
+        // C+V paste. left hand. idle 100ms.
         combo_paste {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
-            key-positions = <23 25>;
+            key-positions = <22 23>;
             bindings = <&kp K_PASTE>;
         };
 
@@ -256,17 +245,17 @@
         compatible = "zmk,keymap";
         layer_0 {
             // x/y = tap/hold. s = sticky.
-            // Esc J+K, Enter L+', Tab Q+W, colon D+K, copy F+H, paste V+N.
+            // Esc J+K, Enter L+', Tab Q+W, colon K+L, copy D+F, paste C+V.
             // |  Q  |  W  |  E  |  R/$ |  T  |     |  Y  |  U  |  I  | O/0 |  P  |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | '/; |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! | /NAV|
-            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC/C-BSPC |
+            //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |
             display-name = "L0";
             bindings = <
                 &kp Q      &kp W      &kp E       &td DLLR R   &kp T        &kp Y      &kp U       &kp I       &td N0 O     &kp P
                 &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L        &qt SEMI SQT
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &ns 0 FSLH
-                                      &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slm L2 L2  &wb LC(BSPC) BSPC
+                                      &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slm L2 L2  &kp BSPC
             >;
         };
 
