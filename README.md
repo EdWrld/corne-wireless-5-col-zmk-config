@@ -96,7 +96,7 @@ clipboard on the same columns as base `X C V`.
 ```
 
 `,` on the left layer thumb: tap comma, hold stacks L1 for NAV. Clipboard
-keys send HID Cut/Copy/Paste, not Ctrl+X/C/V.
+keys send Ctrl+X/C/V. HID Cut/Copy/Paste is ignored on Windows.
 
 ---
 
