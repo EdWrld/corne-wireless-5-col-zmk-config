@@ -18,7 +18,7 @@
 #define L5 5   // NAV
 
 // Base 31/34 = L1/L2 (tap sticky, hold mo). 31+34 = base.
-// L1 34: tap +, hold mo L2. L2 31: tap comma, hold mo L1.
+// L1 34: tap *, hold mo L2. L2 31: tap comma, hold mo L1.
 // NAV = L1+L2, or hold /. P = mouse. / = L4.
 
 // Unused.
@@ -37,7 +37,6 @@
     chosen {
         zmk,physical-layout = &foostan_corne_5col_layout;
     };
-
     behaviors {
         // Unused.
         hm: homerow_mods {
@@ -207,11 +206,11 @@
     combos {
         compatible = "zmk,combos";
 
-        // J+K Esc. idle 100ms.
+        // D+F Esc. idle 100ms.
         combo_esc {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
-            key-positions = <16 17>;
+            key-positions = <12 13>;
             bindings = <&kp ESC>;
         };
 
@@ -222,25 +221,26 @@
             bindings = <&kp RET>;
         };
 
-        // Q+W Tab.
+        // A+S Tab. idle 100ms.
         combo_tab {
             timeout-ms = <50>;
-            key-positions = <0 1>;
+            require-prior-idle-ms = <100>;
+            key-positions = <10 11>;
             bindings = <&kp TAB>;
         };
 
-        // K+L colon. right hand, next to Esc and Enter.
+        // K+L colon. right hand, next to Enter.
         combo_col {
             timeout-ms = <50>;
             key-positions = <17 18>;
             bindings = <&kp COLON>;
         };
 
-        // D+F copy. left home row. idle 100ms.
+        // E+R copy. idle 100ms.
         combo_copy {
             timeout-ms = <50>;
             require-prior-idle-ms = <100>;
-            key-positions = <12 13>;
+            key-positions = <2 3>;
             bindings = <&copy>;
         };
 
@@ -275,14 +275,14 @@
         compatible = "zmk,keymap";
         layer_0 {
             // x/y = tap/hold. s = sticky.
-            // Esc J+K, Enter L+', Tab Q+W, colon K+L, copy D+F, paste C+V.
-            // |  Q  |  W  |  E  |  R/$ |  T  |     |  Y  |  U  |  I  | O/0 |  P  |
+            // Esc D+F, Enter L+', Tab A+S, colon K+L, copy E+R, paste C+V.
+            // | Q/$ |  W  |  E  |  R  |  T  |     |  Y  | U/* |  I  |  O  | P/0 |
             // |  A  |  S  |  D  |  F  |  G  |     |  H  |  J  |  K  |  L  | '/; |
             // |  Z  |  X  |  C  |  V  |  B  |     |  N  |  M  | ,/_ | ./! | /NAV|
             //             |sCTL | L1  |sSFT |     | SPC | L2  |BSPC |
             display-name = "L0";
             bindings = <
-                &kp Q      &kp W      &kp E       &td DLLR R   &kp T        &kp Y      &kp U       &kp I       &td N0 O     &kp P
+                &td DLLR Q &kp W      &kp E       &kp R        &kp T        &kp Y      &td STAR U  &kp I       &kp O        &td N0 P
                 &kp A      &kp S      &kp D       &kp F        &kp G        &kp H      &kp J       &kp K       &kp L        &qt SEMI SQT
                 &kp Z      &kp X      &kp C       &kp V        &kp B        &kp N      &kp M       &td UNDER COMMA  &td EXCL DOT  &ns 0 FSLH
                                       &sk LCTRL   &slm L1 L1  &sk LSHIFT    &kp SPACE  &slm L2 L2  &kp BSPC
@@ -290,16 +290,17 @@
         };
 
         layer_1 {
-            // |ESC| @ | # | % | $ |     | & | * | { | } | -  |
-            // |TAB| < | > | ? | | |     | = | ( | ) | : | ;  |
-            // | - | ! | ` | / | ~ |     | " | ^ | [ | ] | \ |
-            //             | -  | L0 | -  |     | SPC | + |sALT|   + hold = mo L2
+            // | _ | @ | # | % | $ |     | & | + | { | } | -  |
+            // | ~ | < | > | ! | | |     | = | ( | ) | : | ;  |
+            // | - |   | ` | / |   |     | " | ^ | [ | ] | \ |
+            //             | -  | L0 | -  |     | SPC | * |sALT|   * hold = mo L2
             display-name = "L1";
             bindings = <
-                &kp ESC  &kp AT     &kp HASH   &kp PRCNT  &kp DLLR        &kp AMPS   &kp STAR  &kp LBRC   &kp RBRC   &kp MINUS
-                &kp TAB     &kp LT    &kp GT     &kp QMARK  &kp PIPE      &kp EQUAL  &kp LPAR   &kp RPAR   &kp COLON   &kp SEMI
-                &kp MINUS  &kp EXCL   &kp GRAVE  &kp FSLH   &kp TILDE     &kp DQT    &kp CARET  &kp LBKT   &kp RBKT    &kp BSLH
-                                      &trans     &to L0     &trans        &kp SPACE  &lk L2 PLUS  &sk RALT
+                &kp UNDER  &kp AT     &kp HASH   &kp PRCNT  &kp DLLR        &kp AMPS   &kp PLUS   &kp LBRC   &kp RBRC   &kp MINUS
+                &kp TILDE  &kp LT     &kp GT     &kp EXCL   &kp PIPE        &kp EQUAL  &kp LPAR   &kp RPAR   &kp COLON   &kp SEMI
+                &kp MINUS  &trans     &kp GRAVE  &kp FSLH   &trans          &kp DQT    &kp CARET  &kp LBKT   &kp RBKT    &kp BSLH
+                                      &trans     &to L0     &trans        &kp SPACE  &lk L2 STAR  &sk RALT
+
             >;
         };
 
@@ -352,13 +353,14 @@
             // |A-1 |A-2 |A-3 |A-4 |A-5 |     |A-6 |A-7 |A-8 |A-9 |MOUSE|
             // | <- |  v |  ^ | -> |    |     |pane←|pane↓|pane↑|pane→|    |
             // |sGUI|sALT|sSFT|sCTL|    |     |    |SCRL|    |    | L4 |
-            //             |ZOOM| NEW | -  |     |TAB>|TAB<| -  |
+            //             |ZOOM| NEW | -  |     |TAB>|TAB<|GUI |
             display-name = "NAV";
             bindings = <
                 &kp LA(N1)  &kp LA(N2)  &kp LA(N3)  &kp LA(N4)  &kp LA(N5)  &kp LA(N6)  &kp LA(N7)  &kp LA(N8)  &kp LA(N9)  &tog L3
                 &kp LEFT    &kp DOWN    &kp UP      &kp RIGHT   &trans      &kp LA(LS(H)) &kp LA(LS(J)) &kp LA(LS(K)) &kp LA(LS(L)) &trans
                 &sk LGUI    &sk LALT    &sk LSHIFT  &sk LCTRL  &trans      &trans      &tmux_scroll &trans      &trans      &to L4
-                                        &tmux_zoom  &tmux_new   &trans      &kp LC(TAB)  &kp LC(LS(TAB)) &trans
+                                        &tmux_zoom  &tmux_new   &trans      &kp LC(TAB)  &kp LC(LS(TAB)) &kp LGUI
+
             >;
         };
 
