@@ -256,13 +256,13 @@
         layer_1 {
             // | _ | @ | # | % | $ |     | & | + | { | } | -  |
             // | ` | < | > | ! | | |     | = | ( | ) | : | ;  |
-            // | ~ |   | ` | / |   |     | " | ^ | [ | ] | \ |
+            // | ~ |CUT |COPY|PSTE|   |     | " | ^ | [ | ] | \ |
             //             | -  | L0 | -  |     | SPC | * |sALT|   * hold = mo L2
             display-name = "L1";
             bindings = <
                 &kp UNDER  &kp AT     &kp HASH   &kp PRCNT  &kp DLLR        &kp AMPS   &kp PLUS   &kp LBRC   &kp RBRC   &kp MINUS
                 &kp GRAVE  &kp LT     &kp GT     &kp EXCL   &kp PIPE        &kp EQUAL  &kp LPAR   &kp RPAR   &kp COLON   &kp SEMI
-                &kp TILDE  &trans     &kp GRAVE  &kp FSLH   &trans          &kp DQT    &kp CARET  &kp LBKT   &kp RBKT    &kp BSLH
+                &kp TILDE  &cut       &copy      &paste     &trans          &kp DQT    &kp CARET  &kp LBKT   &kp RBKT    &kp BSLH
                                       &trans     &to L0     &trans        &kp SPACE  &lk L2 STAR  &sk RALT
 
             >;
